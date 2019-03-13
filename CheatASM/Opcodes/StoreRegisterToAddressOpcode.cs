@@ -15,7 +15,7 @@ namespace CheatASM
         bool IncrementFlag;
         uint OffsetType;
         uint RegIndex1;
-        UInt32 Value;
+        UInt64 Value;
 
         public StoreRegisterToAddressOpcode(uint[] blocks) : base(blocks[0])
         {
@@ -34,7 +34,7 @@ namespace CheatASM
                     Value = blocks[0] & 0xF;
                 } else
                 {
-                    Value = ((blocks[0] & 0xF) << 32) + blocks[1];
+                    Value = ((UInt64)(blocks[0] & 0xF) << 32) + blocks[1];
                 }
             }
         }

@@ -32,7 +32,7 @@ namespace CheatASM
             IncrementFlag = GetNibble(blocks[0], 5) == 1;
             OffsetEnableFlag = GetNibble(blocks[0], 6) == 1;
             OffsetRegister = GetNibble(blocks[0], 7);
-            Value = (blocks[1] << 32) + blocks[2];
+            Value = ((UInt64)blocks[1] << 32) + blocks[2];
         }
 
         public override string ToASM()

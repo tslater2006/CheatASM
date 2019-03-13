@@ -20,11 +20,11 @@ namespace CheatASM
             BitWidth = (BitWidthType)GetNibble(blocks[0], 2);
             MemType = (MemoryAccessType)GetNibble(blocks[0], 3);
             Condition = (ConditionalComparisonType)GetNibble(blocks[0], 4);
-            Immediate = ((blocks[0] & 0xFF) << 32) + blocks[1];
+            Immediate = ((UInt64)(blocks[0] & 0xFF) << 32) + blocks[1];
 
             if (BitWidth == BitWidthType.q)
             {
-                Value = (blocks[2] << 32) + blocks[3];
+                Value = ((UInt64)blocks[2] << 32) + blocks[3];
             }
             else
             {

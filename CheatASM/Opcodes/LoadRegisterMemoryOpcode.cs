@@ -13,7 +13,7 @@ namespace CheatASM
         MemoryAccessType MemType;
         uint RegisterIndex;
         bool UseReg;
-        long Immediate;
+        UInt64 Immediate;
         public LoadRegisterMemoryOpcode(uint[] blocks) : base(blocks[0])
         {
             BitWidth = (BitWidthType)GetNibble(blocks[0], 2);
@@ -22,7 +22,7 @@ namespace CheatASM
             UseReg = GetNibble(blocks[0], 5) == 1;
             if (UseReg)
             {
-                Immediate = ((blocks[0] & 0xFF) << 32) + blocks[1];
+                Immediate = ((UInt64)(blocks[0] & 0xFF) << 32) + blocks[1];
             }
             else
             {

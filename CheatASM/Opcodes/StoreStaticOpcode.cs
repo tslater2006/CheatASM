@@ -13,7 +13,7 @@ namespace CheatASM
         MemoryAccessType MemType;
         uint OffsetRegister;
         long RelativeAddress;
-        long Value;
+        UInt64 Value;
         public StoreStaticOpcode(UInt32[] blocks) : base(blocks[0])
         {
             BitWidth = (BitWidthType)GetNibble(blocks[0], 2);
@@ -22,7 +22,7 @@ namespace CheatASM
             RelativeAddress = blocks[1];
             if (BitWidth == BitWidthType.q)
             {
-                Value = (blocks[2] << 32) + blocks[3];
+                Value = ((UInt64)blocks[2] << 32) | blocks[3];
             }
             else
             {

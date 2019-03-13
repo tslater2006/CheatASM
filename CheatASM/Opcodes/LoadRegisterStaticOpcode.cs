@@ -14,7 +14,7 @@ namespace CheatASM
         public LoadRegisterStaticOpcode(uint[] blocks) : base(blocks[0])
         {
             RegisterIndex = GetNibble(blocks[0], 4);
-            Value = (blocks[1] << 32) + blocks[2];
+            Value = ((UInt64)blocks[1] << 32) + blocks[2];
         }
 
         public override string ToASM()

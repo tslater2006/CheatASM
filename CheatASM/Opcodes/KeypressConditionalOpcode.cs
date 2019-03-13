@@ -8,7 +8,7 @@ namespace CheatASM
 {
     public class KeypressConditionalOpcode : CheatOpcode
     {
-        KeyMask Mask;
+        public KeyMask Mask;
         public KeypressConditionalOpcode() { }
         public KeypressConditionalOpcode(UInt32[] blocks)
         {
@@ -18,6 +18,11 @@ namespace CheatASM
         public override string ToASM()
         {
             return "keycheck " + Enum.GetName(typeof(KeyMask),Mask);
+        }
+
+        public override string ToByteString()
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -9,10 +9,10 @@ namespace CheatASM
 {
     public class LegacyArithmeticOpcode : CheatOpcode
     {
-        BitWidthType BitWidth;
-        uint RegisterIndex;
-        RegisterArithmeticType MathType;
-        uint Value;
+        public BitWidthType BitWidth;
+        public uint RegisterIndex;
+        public RegisterArithmeticType MathType;
+        public uint Value;
 
         public LegacyArithmeticOpcode() { }
 
@@ -33,6 +33,11 @@ namespace CheatASM
             sb.Append(", 0x").Append(Value.ToString("x"));
 
             return sb.ToString();
+        }
+
+        public override string ToByteString()
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -9,21 +9,12 @@ namespace CheatASM
 {
     public class StoreStaticToAddressOpcode : CheatOpcode
     {
-        /* 6T0RIor0 VVVVVVVV VVVVVVVV
-
-    T: width of memory write (1, 2, 4, or 8 bytes)
-    R: Register used as base memory address.
-    I: Increment register flag (0 = do not increment R, 1 = increment R by T).
-    o: Offset register enable flag (0 = do not add r to address, 1 = add r to address).
-    r: Register used as offset when o is 1.
-    V: Value to write to memory.
- */
-        BitWidthType BitWidth;
-        uint RegisterIndex;
-        bool IncrementFlag;
-        bool OffsetEnableFlag;
-        uint OffsetRegister;
-        UInt64 Value;
+        public BitWidthType BitWidth;
+        public uint RegisterIndex;
+        public bool IncrementFlag;
+        public bool OffsetEnableFlag;
+        public uint OffsetRegister;
+        public UInt64 Value;
 
         public StoreStaticToAddressOpcode() { }
 
@@ -55,6 +46,11 @@ namespace CheatASM
             }
 
             return sb.ToString();
+        }
+
+        public override string ToByteString()
+        {
+            throw new NotImplementedException();
         }
     }
 }

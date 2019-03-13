@@ -9,13 +9,13 @@ namespace CheatASM
 {
     public class LoadRegisterMemoryOpcode : CheatOpcode
     {
-        BitWidthType BitWidth;
-        MemoryAccessType MemType;
-        uint RegisterIndex;
-        bool UseReg;
-        UInt64 Immediate;
+        public BitWidthType BitWidth;
+        public MemoryAccessType MemType;
+        public uint RegisterIndex;
+        public bool UseReg;
+        public UInt64 Immediate;
 
-        public LoadRegisterMemoryOpcode() { };
+        public LoadRegisterMemoryOpcode() { }
 
         public LoadRegisterMemoryOpcode(uint[] blocks)
         {
@@ -55,6 +55,11 @@ namespace CheatASM
             return sb.ToString();
 
 
+        }
+
+        public override string ToByteString()
+        {
+            throw new NotImplementedException();
         }
     }
 }

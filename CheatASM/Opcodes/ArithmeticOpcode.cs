@@ -9,12 +9,13 @@ namespace CheatASM
 {
     public class ArithmeticOpcode : CheatOpcode
     {
-        BitWidthType BitWidth;
-        RegisterArithmeticType MathType;
-        uint RegisterDest;
-        uint RegisterLeft;
-        uint RegisterRight;
-
+        public BitWidthType BitWidth;
+        public RegisterArithmeticType MathType;
+        public uint RegisterDest;
+        public uint RegisterLeft;
+        public uint RegisterRight;
+        public ulong Value;
+        public bool RightHandRegister;
         public ArithmeticOpcode() { }
 
         public ArithmeticOpcode(uint[] blocks)
@@ -23,8 +24,24 @@ namespace CheatASM
             MathType = (RegisterArithmeticType)GetNibble(blocks[0], 3);
             RegisterDest = GetNibble(blocks[0], 4);
             RegisterLeft = GetNibble(blocks[0], 5);
-            RegisterRight = GetNibble(blocks[0], 7);
 
+            if (GetNibble(blocks[0], 6) == 0)
+            {
+                RightHandRegister = true;
+                RegisterRight = GetNibble(blocks[0], 7);
+            }
+            else
+            {
+                RightHandRegister = false;
+                if (BitWidth == BitWidthType.q)
+                {
+                    Value = ((UInt64)blocks[2] << 32) | blocks[3];
+                }
+                else
+                {
+                    Value = blocks[2];
+                }
+            }
         }
 
         public override string ToASM()
@@ -34,9 +51,20 @@ namespace CheatASM
             sb.Append(Enum.GetName(typeof(BitWidthType), BitWidth));
             sb.Append(" R").Append(RegisterDest.ToString("X"));
             sb.Append(", R").Append(RegisterLeft.ToString("X"));
-            sb.Append(", R").Append(RegisterRight.ToString("X"));
+            if (RightHandRegister)
+            {
+                sb.Append(", R").Append(RegisterRight.ToString("X"));
+            } else
+            {
+                sb.Append(", 0x").Append(Value.ToString("x"));
+            }
 
             return sb.ToString();
+        }
+
+        public override string ToByteString()
+        {
+            throw new NotImplementedException();
         }
     }
 }

@@ -8,8 +8,8 @@ namespace CheatASM
 {
     public class LoadRegisterStaticOpcode : CheatOpcode
     {
-        uint RegisterIndex;
-        UInt64 Value;
+        public uint RegisterIndex;
+        public UInt64 Value;
 
         public LoadRegisterStaticOpcode() { }
 
@@ -22,6 +22,11 @@ namespace CheatASM
         public override string ToASM()
         {
             return "movq R" + RegisterIndex.ToString("X") + ", 0x" + Value.ToString("x");
+        }
+
+        public override string ToByteString()
+        {
+            throw new NotImplementedException();
         }
     }
 }

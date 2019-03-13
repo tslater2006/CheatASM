@@ -9,8 +9,8 @@ namespace CheatASM
     public class LoopOpcode : CheatOpcode
     {
         public bool IsEnd;
-        uint RegisterIndex;
-        UInt32 Count;
+        public uint RegisterIndex;
+        public UInt32 Count;
 
         public LoopOpcode() { }
 
@@ -36,5 +36,9 @@ namespace CheatASM
             }
         }
 
+        public override string ToByteString()
+        {
+            throw new NotImplementedException();
+        }
     }
 }

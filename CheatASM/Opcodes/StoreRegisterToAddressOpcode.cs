@@ -9,13 +9,13 @@ namespace CheatASM
 {
     public class StoreRegisterToAddressOpcode : CheatOpcode
     {
-        BitWidthType BitWidth;
-        uint RegisterToWrite;
-        uint RegisterBase;
-        bool IncrementFlag;
-        uint OffsetType;
-        uint RegIndex1;
-        UInt64 Value;
+        public BitWidthType BitWidth;
+        public uint RegisterToWrite;
+        public uint RegisterBase;
+        public bool IncrementFlag;
+        public uint OffsetType;
+        public uint RegIndex1;
+        public UInt64 Value;
 
         public StoreRegisterToAddressOpcode() { }
 
@@ -67,6 +67,11 @@ namespace CheatASM
                 sb.Append(" inc");
             }
             return sb.ToString();
+        }
+
+        public override string ToByteString()
+        {
+            throw new NotImplementedException();
         }
     }
 }

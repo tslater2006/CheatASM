@@ -9,11 +9,11 @@ namespace CheatASM
 {
     public class StoreStaticOpcode : CheatOpcode
     {
-        BitWidthType BitWidth;
-        MemoryAccessType MemType;
-        uint OffsetRegister;
-        long RelativeAddress;
-        UInt64 Value;
+        public BitWidthType BitWidth;
+        public MemoryAccessType MemType;
+        public uint OffsetRegister;
+        public ulong RelativeAddress;
+        public UInt64 Value;
 
         public StoreStaticOpcode() { }
 
@@ -47,6 +47,47 @@ namespace CheatASM
             sb.Append(RelativeAddress.ToString("x"));
             sb.Append("], 0x").Append(Value.ToString("x"));
             return sb.ToString();
+        }
+
+        public override string ToByteString()
+        {
+            /* 0TMR00AA AAAAAAAA VVVVVVVV (VVVVVVVV) */
+            uint[] blocks = null;
+            if (BitWidth == BitWidthType.q)
+            {
+                blocks = new uint[4];
+            } else
+            {
+                blocks = new uint[3];
+            }
+
+            /* build first DWORD */
+            SetNibble(ref blocks[0], 1, 0);
+            SetNibble(ref blocks[0], 2, (uint)BitWidth);
+            SetNibble(ref blocks[0], 3, (uint)MemType);
+            SetNibble(ref blocks[0], 4, (uint)OffsetRegister);
+            SetNibble(ref blocks[0], 5, 0);
+            SetNibble(ref blocks[0], 6, 0);
+            SetNibble(ref blocks[0], 7, (uint)((RelativeAddress >> 36) & 0xF));
+            SetNibble(ref blocks[0], 7, (uint)((RelativeAddress >> 32) & 0xF));
+            blocks[1] = (uint)(RelativeAddress & 0xFFFFFFFF);
+            if (BitWidth == BitWidthType.q)
+            {
+                blocks[2] = (uint)(Value >> 32);
+                blocks[3] = (uint)(Value & 0xFFFFFFFF);
+            }
+            else
+            {
+                blocks[2] = (uint)(Value & 0xFFFFFFFF);
+            }
+
+            StringBuilder sb = new StringBuilder();
+            for (var x = 0; x < blocks.Length; x++)
+            {
+                sb.Append(blocks[x].ToString("X8")).Append(" ");
+            }
+
+            return sb.ToString().Trim();
         }
     }
 }

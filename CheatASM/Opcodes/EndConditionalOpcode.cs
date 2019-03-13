@@ -14,5 +14,10 @@ namespace CheatASM
         {
             return "endcond";
         }
+
+        public override string ToByteString()
+        {
+            return "20000000";
+        }
     }
 }

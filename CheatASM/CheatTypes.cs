@@ -127,12 +127,24 @@ namespace CheatASM
                 case 0xA:
                     return new StoreRegisterToAddressOpcode();
             }
+            return null;
         }
         protected static uint GetNibble(UInt32 block, uint index)
         {
             return (block >> (int)(32 - (index * 4))) & 0xF;
         }
 
+        protected static void SetNibble(ref uint block, uint index, uint value)
+        {
+            uint byteMask = (uint)0xFFFFFFFF - (uint)(0xF << (int)(32 - (index * 4)));
+            block = block & byteMask;
+
+            value = value & 0xF;
+            value = value << (int)(32 - (index * 4));
+            block = block | value;
+        }
+
         public abstract string ToASM();
+        public abstract string ToByteString();
     }
 }

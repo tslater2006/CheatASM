@@ -1,0 +1,23 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+    <TargetFramework>netcoreapp2.2</TargetFramework>
+  </PropertyGroup>
+
+  <PropertyGroup>
+    <Antlr4UseCSharpGenerator>True</Antlr4UseCSharpGenerator>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <Antlr4 Remove="test_files\**" />
+    <Compile Remove="test_files\**" />
+    <EmbeddedResource Remove="test_files\**" />
+    <None Remove="test_files\**" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- This is the required reference which is missing from your project file -->
+    <PackageReference Include="Antlr4" Version="4.6.6" />
+  </ItemGroup>
+
+</Project>

@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.28705.295
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "CheatASM", "CheatASM\CheatASM.csproj", "{05BC400E-582B-4D24-BE51-2D122B6FFB55}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{05BC400E-582B-4D24-BE51-2D122B6FFB55}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{05BC400E-582B-4D24-BE51-2D122B6FFB55}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{05BC400E-582B-4D24-BE51-2D122B6FFB55}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{05BC400E-582B-4D24-BE51-2D122B6FFB55}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {5F1D5B3F-8704-4D2B-B26E-045F774CBC8A}
+	EndGlobalSection
+EndGlobal

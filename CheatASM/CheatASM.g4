@@ -18,17 +18,18 @@ opCode0: MOVE(bitWidth=BIT_WIDTH) LSQUARE (memType=MEM_TYPE)PLUS_SIGN(register=R
 opCode1: (cond=CONDITIONAL)(bitWidth=BIT_WIDTH) LSQUARE(memType=MEM_TYPE)PLUS_SIGN(offset=HEX_NUMBER)RSQUARE COMMA (value=HEX_NUMBER);
 opCode2: END_COND;
 opCode3: LOOP (register=REGISTER) COMMA(value=HEX_NUMBER)
-       | END_LOOP (register=REGISTER);
-opCode4: MOVE(bitWidth=BIT_WIDTH) (register=REGISTER) COMMA (value=HEX_NUMBER);
+       | (endloop=END_LOOP) (register=REGISTER);
+opCode4: MOVE BIT_QUAD (register=REGISTER) COMMA (value=HEX_NUMBER);
 opCode5: MOVE(bitWidth=BIT_WIDTH) (register=REGISTER) COMMA LSQUARE (memType=MEM_TYPE) PLUS_SIGN (offset=HEX_NUMBER) RSQUARE
        |  MOVE(bitWidth=BIT_WIDTH) (register=REGISTER) COMMA LSQUARE (baseRegister=REGISTER) PLUS_SIGN (offset=HEX_NUMBER) RSQUARE;
 opCode6: MOVE(bitWidth=BIT_WIDTH) LSQUARE (register=REGISTER)(PLUS_SIGN(offsetReg=REGISTER))? RSQUARE COMMA (value=HEX_NUMBER) (increment=INCREMENT)?;
 opCode7: (func=LEGACY_ARITHMETIC)(bitWidth=BIT_WIDTH) (register=REGISTER) COMMA (value=HEX_NUMBER);
 opCode8: KEYCHECK (key=KEY);
-opCode9: (func=ARTIHMETIC)(bitWidth=BIT_WIDTH) (dest=REGISTER) COMMA (left=REGISTER) COMMA (right=REGISTER);
-opCodeA: MOVE(bitWidth=BIT_WIDTH) LSQUARE (base=REGISTER) RSQUARE COMMA (source=REGISTER) (increment=INCREMENT)?
-       | MOVE(bitWidth=BIT_WIDTH) LSQUARE (base=REGISTER) PLUS_SIGN (regIndex=REGISTER) RSQUARE COMMA (source=REGISTER) (increment=INCREMENT)?
-       | MOVE(bitWidth=BIT_WIDTH) LSQUARE (base=REGISTER) PLUS_SIGN (value=HEX_NUMBER) RSQUARE COMMA (source=REGISTER) (increment=INCREMENT)?;
+opCode9: (func=ARTIHMETIC)(bitWidth=BIT_WIDTH) (dest=REGISTER) COMMA (leftReg=REGISTER) COMMA (rightReg=REGISTER)
+       | (func=ARTIHMETIC)(bitWidth=BIT_WIDTH) (dest=REGISTER) COMMA (leftReg=REGISTER) COMMA (value=HEX_NUMBER);
+opCodeA: MOVE(bitWidth=BIT_WIDTH) LSQUARE (baseReg=REGISTER) RSQUARE COMMA (sourceReg=REGISTER) (increment=INCREMENT)?
+       | MOVE(bitWidth=BIT_WIDTH) LSQUARE (baseReg=REGISTER) PLUS_SIGN (regIndex=REGISTER) RSQUARE COMMA (sourceReg=REGISTER) (increment=INCREMENT)?
+       | MOVE(bitWidth=BIT_WIDTH) LSQUARE (baseReg=REGISTER) PLUS_SIGN (value=HEX_NUMBER) RSQUARE COMMA (sourceReg=REGISTER) (increment=INCREMENT)?;
 
 // opcodes
 MOVE: 'mov';

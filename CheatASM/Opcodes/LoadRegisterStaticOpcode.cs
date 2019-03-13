@@ -21,12 +21,24 @@ namespace CheatASM
 
         public override string ToASM()
         {
-            return "movq R" + RegisterIndex.ToString("X") + ", 0x" + Value.ToString("x");
+            return "movq R" + RegisterIndex.ToString("X") + ", 0x" + Value.ToString("X");
         }
 
         public override string ToByteString()
         {
-            throw new NotImplementedException();
+            uint[] blocks = new uint[3];
+            SetNibble(ref blocks[0], 1, 4);
+            SetNibble(ref blocks[0], 2, 0);
+            SetNibble(ref blocks[0], 3, 0);
+            SetNibble(ref blocks[0], 4, (uint)RegisterIndex & 0xF);
+            SetNibble(ref blocks[0], 5, 0);
+            SetNibble(ref blocks[0], 6, 0);
+            SetNibble(ref blocks[0], 7, 0);
+            SetNibble(ref blocks[0], 8, 0);
+            blocks[1] = (uint)((Value >> 32) & 0xFFFFFFFF);
+            blocks[2] = (uint)(Value & 0xFFFFFFFF);
+
+            return GetBlocksAsString(blocks);
         }
     }
 }

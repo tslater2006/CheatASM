@@ -44,8 +44,8 @@ namespace CheatASM
             sb.Append(Enum.GetName(typeof(MemoryAccessType), MemType));
 
             sb.Append("+R").Append(OffsetRegister.ToString("X")).Append("+0x");
-            sb.Append(RelativeAddress.ToString("x"));
-            sb.Append("], 0x").Append(Value.ToString("x"));
+            sb.Append(RelativeAddress.ToString("X"));
+            sb.Append("], 0x").Append(Value.ToString("X"));
             return sb.ToString();
         }
 
@@ -81,13 +81,7 @@ namespace CheatASM
                 blocks[2] = (uint)(Value & 0xFFFFFFFF);
             }
 
-            StringBuilder sb = new StringBuilder();
-            for (var x = 0; x < blocks.Length; x++)
-            {
-                sb.Append(blocks[x].ToString("X8")).Append(" ");
-            }
-
-            return sb.ToString().Trim();
+            return GetBlocksAsString(blocks);
         }
     }
 }

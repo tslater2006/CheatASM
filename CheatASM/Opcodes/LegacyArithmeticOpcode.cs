@@ -30,14 +30,27 @@ namespace CheatASM
             sb.Append(Enum.GetName(typeof(RegisterArithmeticType), MathType));
             sb.Append(Enum.GetName(typeof(BitWidthType), BitWidth));
             sb.Append(" R").Append(RegisterIndex.ToString("X"));
-            sb.Append(", 0x").Append(Value.ToString("x"));
+            sb.Append(", 0x").Append(Value.ToString("X"));
 
             return sb.ToString();
         }
 
         public override string ToByteString()
         {
-            throw new NotImplementedException();
+            /* 7T0RC000 VVVVVVVV */
+            uint[] blocks = new uint[2];
+            SetNibble(ref blocks[0], 1, 7);
+            SetNibble(ref blocks[0], 2, ((uint)BitWidth & 0xF));
+            SetNibble(ref blocks[0], 3, 0);
+            SetNibble(ref blocks[0], 4, ((uint)RegisterIndex & 0xF));
+            SetNibble(ref blocks[0], 5, ((uint)MathType & 0xF));
+            SetNibble(ref blocks[0], 6, 0);
+            SetNibble(ref blocks[0], 7, 0);
+            SetNibble(ref blocks[0], 8, 0);
+
+            blocks[1] = (uint)Value;
+
+            return GetBlocksAsString(blocks);
         }
     }
 }

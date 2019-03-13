@@ -19,7 +19,7 @@ opCode1: (cond=CONDITIONAL)(bitWidth=BIT_WIDTH) LSQUARE(memType=MEM_TYPE)PLUS_SI
 opCode2: END_COND;
 opCode3: LOOP (register=REGISTER) COMMA(value=HEX_NUMBER)
        | (endloop=END_LOOP) (register=REGISTER);
-opCode4: MOVE BIT_QUAD (register=REGISTER) COMMA (value=HEX_NUMBER);
+opCode4: MOVE BIT_WIDTH (register=REGISTER) COMMA (value=HEX_NUMBER);
 opCode5: MOVE(bitWidth=BIT_WIDTH) (register=REGISTER) COMMA LSQUARE (memType=MEM_TYPE) PLUS_SIGN (offset=HEX_NUMBER) RSQUARE
        |  MOVE(bitWidth=BIT_WIDTH) (register=REGISTER) COMMA LSQUARE (baseRegister=REGISTER) PLUS_SIGN (offset=HEX_NUMBER) RSQUARE;
 opCode6: MOVE(bitWidth=BIT_WIDTH) LSQUARE (register=REGISTER)(PLUS_SIGN(offsetReg=REGISTER))? RSQUARE COMMA (value=HEX_NUMBER) (increment=INCREMENT)?;

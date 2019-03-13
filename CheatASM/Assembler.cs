@@ -46,7 +46,7 @@ namespace CheatASM
 
                 opTyped.BitWidth = Enum.Parse<BitWidthType>(opCtx.bitWidth.Text, true);
                 opTyped.MemType = Enum.Parse<MemoryAccessType>(opCtx.memType.Text, true);
-                opTyped.OffsetRegister = uint.Parse(opCtx.register.Text.Substring(1));
+                opTyped.OffsetRegister = Convert.ToUInt16(opCtx.register.Text.Substring(1),16);
                 opTyped.RelativeAddress = Convert.ToUInt64(opCtx.offset.Text, 16);
                 opTyped.Value = Convert.ToUInt64(opCtx.value.Text, 16);
                 /* assemble opcode 0 */
@@ -62,8 +62,8 @@ namespace CheatASM
                 opTyped.MemType = Enum.Parse<MemoryAccessType>(opCtx.memType.Text, true);
 
                 opTyped.Condition = Enum.Parse<ConditionalComparisonType>(opCtx.cond.Text, true);
-                opTyped.Immediate = Convert.ToUInt64(opCtx.offset.Text);
-                opTyped.Value = Convert.ToUInt64(opCtx.value.Text);
+                opTyped.Immediate = Convert.ToUInt64(opCtx.offset.Text,16);
+                opTyped.Value = Convert.ToUInt64(opCtx.value.Text,16);
 
             }
             else if (stmt.opCode2() != null)
@@ -79,13 +79,13 @@ namespace CheatASM
                 if (opCtx.endloop != null)
                 {
                     opTyped.IsEnd = true;
-                    opTyped.RegisterIndex = uint.Parse(opCtx.register.Text.Substring(1));
+                    opTyped.RegisterIndex = Convert.ToUInt16(opCtx.register.Text.Substring(1),16);
                 }
                 else
                 {
                     opTyped.IsEnd = false;
-                    opTyped.RegisterIndex = uint.Parse(opCtx.register.Text.Substring(1));
-                    opTyped.Count = Convert.ToUInt32(opCtx.value.Text);
+                    opTyped.RegisterIndex = Convert.ToUInt16(opCtx.register.Text.Substring(1),16);
+                    opTyped.Count = Convert.ToUInt32(opCtx.value.Text,16);
                 }
 
             }
@@ -96,8 +96,8 @@ namespace CheatASM
                 op = opTyped;
 
 
-                opTyped.RegisterIndex = uint.Parse(opCtx.register.Text.Substring(1));
-                opTyped.Value = Convert.ToUInt64(opCtx.value.Text);
+                opTyped.RegisterIndex = Convert.ToUInt16(opCtx.register.Text.Substring(1),16);
+                opTyped.Value = Convert.ToUInt64(opCtx.value.Text,16);
             }
             else if (stmt.opCode5() != null)
             {
@@ -107,8 +107,8 @@ namespace CheatASM
 
                 opTyped.BitWidth = Enum.Parse<BitWidthType>(opCtx.bitWidth.Text, true);
 
-                opTyped.RegisterIndex = uint.Parse(opCtx.register.Text.Substring(1));
-                opTyped.Immediate = Convert.ToUInt64(opCtx.offset.Text);
+                opTyped.RegisterIndex = Convert.ToUInt16(opCtx.register.Text.Substring(1),16);
+                opTyped.Immediate = Convert.ToUInt64(opCtx.offset.Text,16);
 
                 if (opCtx.memType != null)
                 {
@@ -126,7 +126,7 @@ namespace CheatASM
                 op = opTyped;
 
                 opTyped.BitWidth = Enum.Parse<BitWidthType>(opCtx.bitWidth.Text, true);
-                opTyped.RegisterIndex = uint.Parse(opCtx.register.Text.Substring(1));
+                opTyped.RegisterIndex = Convert.ToUInt16(opCtx.register.Text.Substring(1),16);
 
                 if (opCtx.increment != null)
                 {
@@ -135,10 +135,10 @@ namespace CheatASM
                 if (opCtx.offsetReg != null)
                 {
                     opTyped.OffsetEnableFlag = true;
-                    opTyped.OffsetRegister = uint.Parse(opCtx.offsetReg.Text.Substring(1));
+                    opTyped.OffsetRegister = Convert.ToUInt16(opCtx.offsetReg.Text.Substring(1),16);
                 }
 
-                opTyped.Value = Convert.ToUInt64(opCtx.value.Text);
+                opTyped.Value = Convert.ToUInt64(opCtx.value.Text,16);
             }
             else if (stmt.opCode7() != null)
             {
@@ -147,9 +147,9 @@ namespace CheatASM
                 op = opTyped;
 
                 opTyped.BitWidth = Enum.Parse<BitWidthType>(opCtx.bitWidth.Text, true);
-                opTyped.RegisterIndex = uint.Parse(opCtx.register.Text.Substring(1));
+                opTyped.RegisterIndex = Convert.ToUInt16(opCtx.register.Text.Substring(1),16);
                 opTyped.MathType = Enum.Parse<RegisterArithmeticType>(opCtx.func.Text, true);
-                opTyped.Value = Convert.ToUInt32(opCtx.value.Text);
+                opTyped.Value = Convert.ToUInt32(opCtx.value.Text,16);
             }
             else if (stmt.opCode8() != null)
             {

@@ -11,6 +11,40 @@ namespace CheatASM
     {
         static void Main(string[] args)
         {
+            var fileList = Directory.GetFiles(@"Cheats", "*.txt",new EnumerationOptions() { RecurseSubdirectories = true });
+            Disassembler d = new Disassembler();
+            Assembler a = new Assembler();
+            var correct = 0;
+            var wrong = 0;
+            foreach (var file in fileList)
+            {
+                var lines = File.ReadAllLines(file);
+                
+                foreach (var line in lines)
+                {
+                    if (line.StartsWith("[") == false && line.StartsWith("{") == false && line.Trim().Length > 0)
+                    {
+                        /* assume opcode */
+                        var disassembled = d.DisassembleLine(line);
+                        if (disassembled.StartsWith("#"))
+                        {
+                            continue;
+                        } else
+                        {
+                            var assembled = a.AssembleLine(disassembled);
+                            if (assembled.Trim().Equals(line.ToUpper().Trim()) == false)
+                            {
+                                wrong++;
+                            } else
+                            {
+                                correct++;
+                            }
+                        }
+                    }
+                }
+            }
+            Console.Write("Assembler test: " + correct + " out of " + (correct + wrong) + " correct (missed " + wrong + ")!");
+            return;
             /* currently we only support 1 file on the args, this will be improved over time */
             if (args.Length < 1)
             {
@@ -24,20 +58,6 @@ namespace CheatASM
                 return;
             }
 
-            /* currently only the disassembler is working, will become a flag in the future */
-            bool disassemble = false;
-
-            if (disassemble)
-            {
-                Disassembler d = new Disassembler();
-                
-                var text = d.DisassembleFile(args[0]);
-                Console.Write(text);
-            } else
-            {
-                Assembler a = new Assembler();
-                a.AssembleLine("movq [HEAP+R0+0x29af1388] 0x303030303030303");
-            }
             Console.ReadKey();
         }
 

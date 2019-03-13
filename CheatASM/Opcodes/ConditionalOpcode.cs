@@ -40,8 +40,8 @@ namespace CheatASM
             sb.Append(Enum.GetName(typeof(ConditionalComparisonType), Condition));
             sb.Append(Enum.GetName(typeof(BitWidthType), BitWidth));
             sb.Append(" [").Append(Enum.GetName(typeof(MemoryAccessType), MemType));
-            sb.Append("+0x").Append(Immediate.ToString("x"));
-            sb.Append("], 0x").Append(Value.ToString("x"));
+            sb.Append("+0x").Append(Immediate.ToString("X"));
+            sb.Append("], 0x").Append(Value.ToString("X"));
 
             return sb.ToString();
         }
@@ -79,13 +79,7 @@ namespace CheatASM
                 blocks[2] = (uint)(Value & 0xFFFFFFFF);
             }
 
-            StringBuilder sb = new StringBuilder();
-            for (var x = 0; x < blocks.Length; x++)
-            {
-                sb.Append(blocks[x].ToString("X8")).Append(" ");
-            }
-
-            return sb.ToString().Trim();
+            return GetBlocksAsString(blocks);
 
         }
     }

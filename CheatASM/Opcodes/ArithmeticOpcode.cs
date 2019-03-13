@@ -56,7 +56,7 @@ namespace CheatASM
                 sb.Append(", R").Append(RegisterRight.ToString("X"));
             } else
             {
-                sb.Append(", 0x").Append(Value.ToString("x"));
+                sb.Append(", 0x").Append(Value.ToString("X"));
             }
 
             return sb.ToString();
@@ -64,7 +64,44 @@ namespace CheatASM
 
         public override string ToByteString()
         {
-            throw new NotImplementedException();
+            uint[] blocks = null;
+            if (BitWidth == BitWidthType.q)
+            {
+                blocks = new uint[4];
+            } else
+            {
+                blocks = new uint[3];
+            }
+
+            SetNibble(ref blocks[0], 1, 9);
+            SetNibble(ref blocks[0], 2, ((uint)BitWidth & 0xF));
+            SetNibble(ref blocks[0], 3, ((uint)MathType & 0xF));
+            SetNibble(ref blocks[0], 4, ((uint)RegisterDest & 0xF));
+            SetNibble(ref blocks[0], 5, ((uint)RegisterLeft & 0xF));
+            if (RightHandRegister)
+            {
+                SetNibble(ref blocks[0], 6, 0);
+                SetNibble(ref blocks[0], 7, ((uint)RegisterRight & 0xF));
+            } else
+            {
+                SetNibble(ref blocks[0], 6, 1);
+                SetNibble(ref blocks[0], 7, 0);
+            }
+            SetNibble(ref blocks[0], 8, 0);
+
+            if (!RightHandRegister)
+            {
+                if (BitWidth == BitWidthType.q)
+                {
+                    blocks[1] = (uint)(Value >> 32);
+                    blocks[2] = (uint)(Value & 0xFFFFFFFF);
+                } else
+                {
+                    blocks[1] = (UInt32)Value;
+                }
+            }
+
+            return GetBlocksAsString(blocks);
         }
     }
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text;
 
 /* The types located in this file are based of the Atmosphère cheat implementation: 
    https://github.com/Atmosphere-NX/Atmosphere/blob/master/stratosphere/dmnt/source/dmnt_cheat_vm.hpp
@@ -113,6 +114,17 @@ namespace CheatASM
             value &= 0xF;
             value <<= (int)(32 - (index * 4));
             block |= value;
+        }
+
+        protected static string GetBlocksAsString(uint[] blocks)
+        {
+            StringBuilder sb = new StringBuilder();
+            for (var x = 0; x < blocks.Length; x++)
+            {
+                sb.Append(blocks[x].ToString("X8")).Append(" ");
+            }
+
+            return sb.ToString().Trim();
         }
 
         public abstract string ToASM();

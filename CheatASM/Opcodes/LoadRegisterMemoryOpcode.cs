@@ -51,7 +51,7 @@ namespace CheatASM
                 sb.Append(Enum.GetName(typeof(MemoryAccessType), MemType));
             }
 
-            sb.Append("+0x").Append(Immediate.ToString("x")).Append("]");
+            sb.Append("+0x").Append(Immediate.ToString("X")).Append("]");
             return sb.ToString();
 
 
@@ -59,7 +59,29 @@ namespace CheatASM
 
         public override string ToByteString()
         {
-            throw new NotImplementedException();
+            /* 5TMR00AA AAAAAAAA */
+            uint[] blocks = new uint[2];
+            SetNibble(ref blocks[0], 1, 5);
+            SetNibble(ref blocks[0], 2, ((uint)BitWidth & 0xF));
+            SetNibble(ref blocks[0], 3, ((uint)MemType & 0xF));
+            SetNibble(ref blocks[0], 4, ((uint)RegisterIndex & 0xF));
+
+            if (UseReg)
+            {
+                SetNibble(ref blocks[0], 5, 1);
+            }
+            else
+            {
+                SetNibble(ref blocks[0], 5, 0);
+            }
+            SetNibble(ref blocks[0], 6, 0);
+
+            SetNibble(ref blocks[0], 7, (uint)((Immediate >> 36) & 0xF));
+            SetNibble(ref blocks[0], 8, (uint)((Immediate >> 32) & 0xF));
+
+            blocks[1] = (uint)(Immediate & 0xFFFFFFFF);
+
+            return GetBlocksAsString(blocks);
         }
     }
 }

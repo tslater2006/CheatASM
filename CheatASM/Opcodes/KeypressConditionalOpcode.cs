@@ -22,7 +22,13 @@ namespace CheatASM
 
         public override string ToByteString()
         {
-            throw new NotImplementedException();
+            uint[] blocks = new uint[1];
+            SetNibble(ref blocks[0], 1, 8);
+
+            var byteMask = ((uint)Mask & 0x0FFFFFFF);
+            blocks[0] |= byteMask;
+
+            return GetBlocksAsString(blocks);
         }
     }
 }

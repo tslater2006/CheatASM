@@ -39,7 +39,7 @@ namespace CheatASM
             {
                 sb.Append("+").Append("R" + OffsetRegister.ToString("X"));
             }
-            sb.Append("], 0x").Append(Value.ToString("x"));
+            sb.Append("], 0x").Append(Value.ToString("X"));
             if (IncrementFlag)
             {
                 sb.Append(" inc");
@@ -50,7 +50,38 @@ namespace CheatASM
 
         public override string ToByteString()
         {
-            throw new NotImplementedException();
+            /* 6T0RIor0 VVVVVVVV VVVVVVVV */
+
+            uint[] blocks = new uint[3];
+            SetNibble(ref blocks[0], 1, 6);
+            SetNibble(ref blocks[0], 2, (uint)BitWidth & 0xF);
+            SetNibble(ref blocks[0], 3, 0);
+            SetNibble(ref blocks[0], 4, (uint)RegisterIndex & 0xF);
+
+            if (IncrementFlag)
+            {
+                SetNibble(ref blocks[0], 5, 1);
+            } else
+            {
+                SetNibble(ref blocks[0], 5, 0);
+            }
+
+            if (OffsetEnableFlag)
+            {
+                SetNibble(ref blocks[0], 6, 1);
+            }
+            else
+            {
+                SetNibble(ref blocks[0], 6, 0);
+            }
+
+            SetNibble(ref blocks[0], 7, (uint)OffsetRegister & 0xF);
+            SetNibble(ref blocks[0], 8, 0);
+
+            blocks[1] = (uint)((Value >> 32) & 0xFFFFFFFF);
+            blocks[2] = (uint)(Value & 0xFFFFFFFF);
+
+            return GetBlocksAsString(blocks);
         }
     }
 }

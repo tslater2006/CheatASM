@@ -10,15 +10,17 @@ namespace CheatASM
 {
     public class Disassembler
     {
-        int conditionalIndent = 0;
+        uint conditionalIndent = 0;
         private void WriteOpcode(CheatOpcode op, StringBuilder sb)
         {
-            var indent = string.Concat(Enumerable.Repeat("  ", conditionalIndent));
+            var indent = string.Concat(Enumerable.Repeat("  ", (int)conditionalIndent));
             sb.Append(indent);
             sb.Append(op.ToASM());
         }
         public string DisassembleLine(string line)
         {
+            /* trim the line... */
+            line = line.Trim();
             StringBuilder sb = new StringBuilder();
             CheatOpcode op = null;
             /* its a code... lets parse it */
@@ -92,7 +94,7 @@ namespace CheatASM
             }
             catch (Exception ex)
             {
-                var indent = string.Concat(Enumerable.Repeat("  ", conditionalIndent));
+                var indent = string.Concat(Enumerable.Repeat("  ", (int)conditionalIndent));
                 sb.Append(indent);
                 sb.Append("# Invalid Cheat Opcode: " + line.Trim());
             }

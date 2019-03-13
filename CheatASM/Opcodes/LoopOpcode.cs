@@ -29,7 +29,7 @@ namespace CheatASM
         {
             if (!IsEnd)
             {
-                return "loop R" + RegisterIndex.ToString("X") + ", 0x" + Count.ToString("x");
+                return "loop R" + RegisterIndex.ToString("X") + ", 0x" + Count.ToString("X");
             } else
             {
                 return "endloop R" + RegisterIndex.ToString("X");
@@ -38,7 +38,41 @@ namespace CheatASM
 
         public override string ToByteString()
         {
-            throw new NotImplementedException();
+            uint[] blocks = null;
+            if (IsEnd)
+            {
+                blocks = new uint[1];
+            } else
+            {
+                blocks = new uint[2];
+            }
+
+            if (IsEnd)
+            {
+                SetNibble(ref blocks[0], 1, 3);
+                SetNibble(ref blocks[0], 2, 1);
+                SetNibble(ref blocks[0], 3, 0);
+                SetNibble(ref blocks[0], 4, (uint)RegisterIndex & 0xF);
+                SetNibble(ref blocks[0], 5, 0);
+                SetNibble(ref blocks[0], 6, 0);
+                SetNibble(ref blocks[0], 7, 0);
+                SetNibble(ref blocks[0], 8, 0);
+
+            } else
+            {
+                SetNibble(ref blocks[0], 1, 3);
+                SetNibble(ref blocks[0], 2, 0);
+                SetNibble(ref blocks[0], 3, 0);
+                SetNibble(ref blocks[0], 4, (uint)RegisterIndex & 0xF);
+                SetNibble(ref blocks[0], 5, 0);
+                SetNibble(ref blocks[0], 6, 0);
+                SetNibble(ref blocks[0], 7, 0);
+                SetNibble(ref blocks[0], 8, 0);
+
+                blocks[1] = Count;
+            }
+
+            return GetBlocksAsString(blocks);
         }
     }
 }

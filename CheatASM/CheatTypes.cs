@@ -100,35 +100,6 @@ namespace CheatASM
 
     public abstract class CheatOpcode
     {
-        public static CheatOpcode GetOpcodeByNumber(int num)
-        {
-            switch(num)
-            {
-                case 0:
-                    return new StoreStaticOpcode();
-                case 1:
-                    return new ConditionalOpcode();
-                case 2:
-                    return new EndConditionalOpcode();
-                case 3:
-                    return new LoopOpcode();
-                case 4:
-                    return new LoadRegisterStaticOpcode();
-                case 5:
-                    return new LoadRegisterMemoryOpcode();
-                case 6:
-                    return new StoreStaticToAddressOpcode();
-                case 7:
-                    return new LegacyArithmeticOpcode();
-                case 8:
-                    return new KeypressConditionalOpcode();
-                case 9:
-                    return new ArithmeticOpcode();
-                case 0xA:
-                    return new StoreRegisterToAddressOpcode();
-            }
-            return null;
-        }
         protected static uint GetNibble(UInt32 block, uint index)
         {
             return (block >> (int)(32 - (index * 4))) & 0xF;
@@ -137,11 +108,11 @@ namespace CheatASM
         protected static void SetNibble(ref uint block, uint index, uint value)
         {
             uint byteMask = (uint)0xFFFFFFFF - (uint)(0xF << (int)(32 - (index * 4)));
-            block = block & byteMask;
+            block &= byteMask;
 
-            value = value & 0xF;
-            value = value << (int)(32 - (index * 4));
-            block = block | value;
+            value &= 0xF;
+            value <<= (int)(32 - (index * 4));
+            block |= value;
         }
 
         public abstract string ToASM();

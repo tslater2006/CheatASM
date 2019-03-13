@@ -14,7 +14,9 @@ namespace CheatASM
         RegisterArithmeticType MathType;
         uint Value;
 
-        public LegacyArithmeticOpcode(uint[] blocks) : base(blocks[0])
+        public LegacyArithmeticOpcode() { }
+
+        public LegacyArithmeticOpcode(uint[] blocks)
         {
             BitWidth = (BitWidthType)GetNibble(blocks[0], 2);
             RegisterIndex = GetNibble(blocks[0], 4);

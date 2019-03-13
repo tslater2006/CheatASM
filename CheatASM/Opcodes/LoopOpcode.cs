@@ -12,7 +12,9 @@ namespace CheatASM
         uint RegisterIndex;
         UInt32 Count;
 
-        public LoopOpcode(uint[] blocks) : base(blocks[0])
+        public LoopOpcode() { }
+
+        public LoopOpcode(uint[] blocks)
         {
             IsEnd = GetNibble(blocks[0], 2) == 1;
             RegisterIndex = GetNibble(blocks[0], 4);

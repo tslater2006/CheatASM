@@ -14,7 +14,10 @@ namespace CheatASM
         uint RegisterIndex;
         bool UseReg;
         UInt64 Immediate;
-        public LoadRegisterMemoryOpcode(uint[] blocks) : base(blocks[0])
+
+        public LoadRegisterMemoryOpcode() { };
+
+        public LoadRegisterMemoryOpcode(uint[] blocks)
         {
             BitWidth = (BitWidthType)GetNibble(blocks[0], 2);
             MemType = (MemoryAccessType)GetNibble(blocks[0], 3);

@@ -11,7 +11,9 @@ namespace CheatASM
         uint RegisterIndex;
         UInt64 Value;
 
-        public LoadRegisterStaticOpcode(uint[] blocks) : base(blocks[0])
+        public LoadRegisterStaticOpcode() { }
+
+        public LoadRegisterStaticOpcode(uint[] blocks)
         {
             RegisterIndex = GetNibble(blocks[0], 4);
             Value = ((UInt64)blocks[1] << 32) + blocks[2];

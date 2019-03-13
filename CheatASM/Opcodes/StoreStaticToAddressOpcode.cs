@@ -25,7 +25,9 @@ namespace CheatASM
         uint OffsetRegister;
         UInt64 Value;
 
-        public StoreStaticToAddressOpcode(UInt32[] blocks) : base(blocks[0])
+        public StoreStaticToAddressOpcode() { }
+
+        public StoreStaticToAddressOpcode(UInt32[] blocks)
         {
             BitWidth = (BitWidthType)GetNibble(blocks[0], 2);
             RegisterIndex = GetNibble(blocks[0], 4);

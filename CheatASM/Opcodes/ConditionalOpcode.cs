@@ -15,7 +15,9 @@ namespace CheatASM
         UInt64 Immediate;
         UInt64 Value;
 
-        public ConditionalOpcode(uint[] blocks) : base(blocks[0])
+        public ConditionalOpcode() { }
+
+        public ConditionalOpcode(uint[] blocks)
         {
             BitWidth = (BitWidthType)GetNibble(blocks[0], 2);
             MemType = (MemoryAccessType)GetNibble(blocks[0], 3);

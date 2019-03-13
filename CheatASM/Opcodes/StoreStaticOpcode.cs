@@ -14,7 +14,10 @@ namespace CheatASM
         uint OffsetRegister;
         long RelativeAddress;
         UInt64 Value;
-        public StoreStaticOpcode(UInt32[] blocks) : base(blocks[0])
+
+        public StoreStaticOpcode() { }
+
+        public StoreStaticOpcode(UInt32[] blocks)
         {
             BitWidth = (BitWidthType)GetNibble(blocks[0], 2);
             MemType = (MemoryAccessType)GetNibble(blocks[0], 3);

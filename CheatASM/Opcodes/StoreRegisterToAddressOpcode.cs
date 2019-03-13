@@ -17,7 +17,9 @@ namespace CheatASM
         uint RegIndex1;
         UInt64 Value;
 
-        public StoreRegisterToAddressOpcode(uint[] blocks) : base(blocks[0])
+        public StoreRegisterToAddressOpcode() { }
+
+        public StoreRegisterToAddressOpcode(uint[] blocks)
         {
             BitWidth = (BitWidthType)GetNibble(blocks[0], 2);
             RegisterToWrite = GetNibble(blocks[0], 3);

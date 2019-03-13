@@ -100,10 +100,33 @@ namespace CheatASM
 
     public abstract class CheatOpcode
     {
-        public CheatOpcodeType Type;
-        public CheatOpcode(uint firstBlock)
+        public static CheatOpcode GetOpcodeByNumber(int num)
         {
-            Type = (CheatOpcodeType)GetNibble(firstBlock, 1);
+            switch(num)
+            {
+                case 0:
+                    return new StoreStaticOpcode();
+                case 1:
+                    return new ConditionalOpcode();
+                case 2:
+                    return new EndConditionalOpcode();
+                case 3:
+                    return new LoopOpcode();
+                case 4:
+                    return new LoadRegisterStaticOpcode();
+                case 5:
+                    return new LoadRegisterMemoryOpcode();
+                case 6:
+                    return new StoreStaticToAddressOpcode();
+                case 7:
+                    return new LegacyArithmeticOpcode();
+                case 8:
+                    return new KeypressConditionalOpcode();
+                case 9:
+                    return new ArithmeticOpcode();
+                case 0xA:
+                    return new StoreRegisterToAddressOpcode();
+            }
         }
         protected static uint GetNibble(UInt32 block, uint index)
         {

@@ -6,7 +6,9 @@ namespace CheatASM
 {
     public class EndConditionalOpcode : CheatOpcode
     {
-        public EndConditionalOpcode(uint[] blocks) : base(blocks[0]) { }
+        public EndConditionalOpcode() { }
+
+        public EndConditionalOpcode(uint[] blocks) { }
 
         public override string ToASM()
         {

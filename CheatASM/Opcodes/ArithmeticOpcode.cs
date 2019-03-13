@@ -15,7 +15,9 @@ namespace CheatASM
         uint RegisterLeft;
         uint RegisterRight;
 
-        public ArithmeticOpcode(uint[] blocks) : base(blocks[0])
+        public ArithmeticOpcode() { }
+
+        public ArithmeticOpcode(uint[] blocks)
         {
             BitWidth = (BitWidthType)GetNibble(blocks[0], 2);
             MathType = (RegisterArithmeticType)GetNibble(blocks[0], 3);

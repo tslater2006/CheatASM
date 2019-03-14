@@ -62,7 +62,7 @@ $ sudo apt-get install dotnet-sdk-2.2
 $ git clone https://github.com/tslater2006/CheatASM.git
 $ cd CheatASM
 $ dotnet publish -c Release -r linux-x64 --self-contained false
-$ cd ///
+$ cd CheatASM/bin/Release/netcoreapp2.2/linux-x64/publish/
 $ ./CheatASM -h
 ```
 

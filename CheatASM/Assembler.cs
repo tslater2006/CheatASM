@@ -3,6 +3,7 @@ using Antlr4.Runtime.Misc;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Text;
 using static CheatASM.CheatASMParser;
 
@@ -18,6 +19,26 @@ namespace CheatASM
             base.SyntaxError(recognizer, offendingSymbol, line, charPositionInLine, msg, e);
             errorMsg = msg;
             errorPos = charPositionInLine;
+        }
+        public string AssembleFile(string filePath)
+        {
+            StringBuilder sb = new StringBuilder();
+            sb.Clear();
+
+            foreach (string line in File.ReadLines(filePath))
+            {
+                if (line.StartsWith("{") || line.StartsWith("[") || line.Trim().Length == 0)
+                {
+                    sb.AppendLine(line);
+                }
+                else
+                {
+                    var lineOut = AssembleLine(line);
+                    sb.AppendLine(lineOut);
+
+                }
+            }
+            return sb.ToString();
         }
         public string AssembleLine(string line)
         {

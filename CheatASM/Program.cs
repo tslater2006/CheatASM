@@ -1,9 +1,11 @@
-﻿using System;
+﻿using Mono.Options;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
+using System.Text;
 
 namespace CheatASM
 {
@@ -11,54 +13,120 @@ namespace CheatASM
     {
         static void Main(string[] args)
         {
-            var fileList = Directory.GetFiles(@"Cheats", "*.txt",new EnumerationOptions() { RecurseSubdirectories = true });
-            Disassembler d = new Disassembler();
-            Assembler a = new Assembler();
-            var correct = 0;
-            var wrong = 0;
-            foreach (var file in fileList)
+            bool help = false;
+            string inputPath = "";
+            string outputPath = "";
+            bool disassemble = false;
+            bool assemble = false;
+            bool recursive = false;
+            bool verbose = false;
+            OptionSet optSet = new OptionSet();
+            optSet.Add("?|help|h", "Prints out the options.", option => help = option != null);
+            optSet.Add("d|disassemble", "Disassembler mode.", option => disassemble = option != null);
+            optSet.Add("a|assemble", "Assembler mode.", option => assemble = option != null);
+            optSet.Add("i=|in=", "Input File or Directory.", option => inputPath = option);
+            optSet.Add("o=|out=", "Output File or Directory.", option => outputPath = option);
+            optSet.Add("r|recursive", "Process directory recursively.", option => recursive = option != null);
+            optSet.Add("v|verbose", "Verbose Logging.", option => verbose = option != null);
+
+            optSet.Parse(args);
+
+            if (assemble && disassemble)
             {
-                var lines = File.ReadAllLines(file);
-                
-                foreach (var line in lines)
+                Console.Error.WriteLine("You cannot specifiy both assembler and disassembler modes simultaneously.");
+                return;
+            }
+
+            if (help)
+            {
+                Console.WriteLine("Usage: CheatASM -d/a -in FILE -out FILE");
+                optSet.WriteOptionDescriptions(Console.Error);
+            }
+
+            /* ensure input exists and determine if it is a directory or not */
+            bool isInputDir = false;
+            if (Directory.Exists(inputPath))
+            {
+                isInputDir = true;
+                /* if you specified an input directory you must specifiy an output */
+                if (outputPath == "")
                 {
-                    if (line.StartsWith("[") == false && line.StartsWith("{") == false && line.Trim().Length > 0)
-                    {
-                        /* assume opcode */
-                        var disassembled = d.DisassembleLine(line);
-                        if (disassembled.StartsWith("#"))
-                        {
-                            continue;
-                        } else
-                        {
-                            var assembled = a.AssembleLine(disassembled);
-                            if (assembled.Trim().Equals(line.ToUpper().Trim()) == false)
-                            {
-                                wrong++;
-                            } else
-                            {
-                                correct++;
-                            }
-                        }
-                    }
+                    Console.Error.WriteLine("When processing a directoy an output directory *must* be specified.");
+                    return;
                 }
             }
-            Console.Write("Assembler test: " + correct + " out of " + (correct + wrong) + " correct (missed " + wrong + ")!");
-            return;
-            /* currently we only support 1 file on the args, this will be improved over time */
-            if (args.Length < 1)
+            else
             {
-                Console.WriteLine("Please specify a cheat file to disassemble.");
-                return;
+                if (File.Exists(inputPath))
+                {
+                    isInputDir = false;
+                }
+                else
+                {
+                    /* input path isn't an existing file or directory */
+                    Console.Error.WriteLine("Unable to find the input path specified.");
+                    return;
+                }
             }
 
-            if (File.Exists(args[0]) == false)
+            /* at this point we know the inputPath exists, and if its a folder or not */
+
+            Assembler asm = new Assembler();
+            Disassembler disasm = new Disassembler();
+
+            if (isInputDir)
             {
-                Console.WriteLine("Please specify an existing cheat file to disassemble.");
-                return;
+                string[] fileList = Directory.GetFiles(inputPath, "*.txt", new EnumerationOptions() { RecurseSubdirectories = recursive });
+
+                foreach (var file in fileList)
+                {
+                    var relativePath = file.Replace(inputPath, "");
+
+                    /* make sure folder exists */
+                    var newFolderPath = outputPath + relativePath.Substring(0,relativePath.LastIndexOf(Path.DirectorySeparatorChar));
+                    Directory.CreateDirectory(newFolderPath);
+                    if (verbose)
+                    {
+                        Console.WriteLine("Saving " + outputPath + relativePath + "...");
+                    }
+                    if (assemble)
+                    {
+                        File.WriteAllText(outputPath + relativePath, asm.AssembleFile(file));
+                    } else
+                    {
+                        File.WriteAllText(outputPath + relativePath, disasm.DisassembleFile(file));
+                    }
+                }
+                Console.WriteLine("Processed " + fileList.Length + " files.");
+            }
+            else
+            {
+                /* dealing with a single file */
+                if (assemble)
+                {
+                    if (outputPath != "")
+                    {
+                        File.WriteAllText(outputPath, asm.AssembleFile(inputPath));
+                    }
+                    else
+                    {
+                        Console.Write(asm.AssembleFile(inputPath));
+                    }
+                }else
+                {
+                    if (outputPath != "")
+                    {
+                        File.WriteAllText(outputPath, asm.AssembleFile(inputPath));
+                    }
+                    else
+                    {
+                        Console.Write(disasm.DisassembleFile(inputPath));
+                    }
+                }
+
+
             }
 
-            Console.ReadKey();
         }
 
     }

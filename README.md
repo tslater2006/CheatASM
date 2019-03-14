@@ -2,10 +2,6 @@
 
 CheatASM is a utility to disassemble Atmosphere Cheat Codes into an assembly-like language for better reading/writing of them. Similarly it can reassemble the assembly-like language into the format supported by Atmosphere.
 
-## Getting Started
-
-These instructions will get you a copy of the project up and running on your local machine for development and testing purposes. See deployment for notes on how to deploy the project on a live system.
-
 ### Prerequisites
 
 In order to run the software your machine must have the dotnetcore 2.2+ runtime installed. To build the project you need the have the SDK installed instead.

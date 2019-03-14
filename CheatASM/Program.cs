@@ -116,7 +116,7 @@ namespace CheatASM
                 {
                     if (outputPath != "")
                     {
-                        File.WriteAllText(outputPath, asm.AssembleFile(inputPath));
+                        File.WriteAllText(outputPath, disasm.DisassembleFile(inputPath));
                     }
                     else
                     {

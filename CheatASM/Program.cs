@@ -20,12 +20,14 @@ namespace CheatASM
             bool assemble = false;
             bool recursive = false;
             bool verbose = false;
+            string text = "";
             OptionSet optSet = new OptionSet();
             optSet.Add("?|help|h", "Prints out the options.", option => help = option != null);
             optSet.Add("d|disassemble", "Disassembler mode.", option => disassemble = option != null);
             optSet.Add("a|assemble", "Assembler mode.", option => assemble = option != null);
             optSet.Add("i=|in=", "Input File or Directory.", option => inputPath = option);
             optSet.Add("o=|out=", "Output File or Directory.", option => outputPath = option);
+            optSet.Add("t=|text=", "String to dis/assemble.", option => text = option);
             optSet.Add("r|recursive", "Process directory recursively.", option => recursive = option != null);
             optSet.Add("v|verbose", "Verbose Logging.", option => verbose = option != null);
 
@@ -45,6 +47,7 @@ namespace CheatASM
 
             /* ensure input exists and determine if it is a directory or not */
             bool isInputDir = false;
+            bool textMode = false;
             if (Directory.Exists(inputPath))
             {
                 isInputDir = true;
@@ -63,9 +66,15 @@ namespace CheatASM
                 }
                 else
                 {
-                    /* input path isn't an existing file or directory */
-                    Console.Error.WriteLine("Unable to find the input path specified.");
-                    return;
+                    if (text == "")
+                    {
+                        /* input path isn't an existing file or directory */
+                        Console.Error.WriteLine("Unable to find the input path specified.");
+                        return;
+                    } else
+                    {
+                        textMode = true;
+                    }
                 }
             }
 
@@ -106,21 +115,49 @@ namespace CheatASM
                 {
                     if (outputPath != "")
                     {
-                        File.WriteAllText(outputPath, asm.AssembleFile(inputPath));
+                        if (textMode)
+                        {
+                            File.WriteAllText(outputPath, asm.AssembleLine(text));
+                        }
+                        else
+                        {
+                            File.WriteAllText(outputPath, asm.AssembleFile(inputPath));
+                        }
                     }
                     else
                     {
-                        Console.Write(asm.AssembleFile(inputPath));
+                        if (textMode)
+                        {
+                            Console.Write(asm.AssembleLine(text));
+                        }
+                        else
+                        {
+                            Console.Write(asm.AssembleFile(inputPath));
+                        }
                     }
                 }else
                 {
                     if (outputPath != "")
                     {
-                        File.WriteAllText(outputPath, disasm.DisassembleFile(inputPath));
+                        if (textMode)
+                        {
+                            File.WriteAllText(outputPath, disasm.DisassembleLine(text));
+                        }
+                        else
+                        {
+                            File.WriteAllText(outputPath, disasm.DisassembleFile(inputPath));
+                        }
                     }
                     else
                     {
-                        Console.Write(disasm.DisassembleFile(inputPath));
+                        if (textMode)
+                        {
+                            Console.Write(disasm.DisassembleLine(text));
+                        }
+                        else
+                        {
+                            Console.Write(disasm.DisassembleFile(inputPath));
+                        }
                     }
                 }
 

@@ -21,10 +21,12 @@ CheatASM has 2 overall modes -d for disassembly and -a for assembly, you cannot 
 
 #### Disassemble File to Standard Out
 If no -o flag is provided CheatASM will output the result to stdout.
+
 `CheatASM -d -i 03fd1524e17a841c.txt`
 
 #### Disassemble File to File
 By providing an -o flag, the output will be writen to file
+
 `CheatASM -d -i 03fd1524e17a841c.txt -o 03fd1524e17a841c_asm.txt`
 
 #### Assembling File to File
@@ -33,7 +35,9 @@ By providing an -o flag, the output will be writen to file
 #### Disassemble Directory Recursively
 When specifying a directory for the -i flag a corresponding -o flag MUST be provided.
 If the -o flag specifies the same folder as -i the files will be overwritten.
-`CheatASM -d -r -i CheatsFolder -o CheatsDisassembled`
+`
+CheatASM -d -r -i CheatsFolder -o CheatsDisassembled
+`
 
 ## Assembly Mnemonics
 

@@ -35,8 +35,20 @@ By providing an -o flag, the output will be writen to file
 #### Disassemble Directory Recursively
 When specifying a directory for the -i flag a corresponding -o flag MUST be provided.
 If the -o flag specifies the same folder as -i the files will be overwritten.
+
 `
 CheatASM -d -r -i CheatsFolder -o CheatsDisassembled
+`
+
+#### Disassemble Opcode Directly
+CheatASM also allows for the dis/assembly of a opcode or assembly instruction directly using the -t parameter. If -o is not specified the result will be written to stdout, otherwise to the file specified by the -o parameter.
+
+`
+CheatASM -d -t "04010000 006C7634 0098967F"
+`
+
+`
+CheatASM -a -t "movd [MAIN+R1+0x6C7634], 0x98967F"
 `
 
 ## Assembly Mnemonics

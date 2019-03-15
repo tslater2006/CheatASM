@@ -14,6 +14,24 @@ If running from an official release, simply extract the archive for your archite
 
 For running from source, see the "Building" section below
 
+## Example
+
+### Disassembly output
+
+```
+11130000 56C04A6C 0000000A
+01100000 56C04A6C 0000000A
+20000000
+```
+
+becomes
+
+```
+ltb [HEAP+0x56C04A6C], 0xA
+  movb [HEAP+R0+0x56C04A6C], 0xA
+endcond
+```
+
 ## Usage
 Here are some useful examples of how to use this utility (please see -h for a full listing of command line arguments)
 

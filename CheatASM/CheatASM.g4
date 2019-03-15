@@ -12,7 +12,8 @@ statement: opCode0
          | opCode7
          | opCode8
          | opCode9
-         | opCodeA;
+         | opCodeA
+		 | opCodeC0;
 
 opCode0: MOVE(bitWidth=BIT_WIDTH) LSQUARE (memType=MEM_TYPE)PLUS_SIGN(register=REGISTER)PLUS_SIGN(offset=HEX_NUMBER) RSQUARE COMMA (value=HEX_NUMBER);
 opCode1: (cond=CONDITIONAL)(bitWidth=BIT_WIDTH) LSQUARE(memType=MEM_TYPE)PLUS_SIGN(offset=HEX_NUMBER)RSQUARE COMMA (value=HEX_NUMBER);
@@ -30,6 +31,12 @@ opCode9: (func=ARTIHMETIC)(bitWidth=BIT_WIDTH) (dest=REGISTER) COMMA (leftReg=RE
 opCodeA: MOVE(bitWidth=BIT_WIDTH) LSQUARE (baseReg=REGISTER) RSQUARE COMMA (sourceReg=REGISTER) (increment=INCREMENT)?
        | MOVE(bitWidth=BIT_WIDTH) LSQUARE (baseReg=REGISTER) PLUS_SIGN (regIndex=REGISTER) RSQUARE COMMA (sourceReg=REGISTER) (increment=INCREMENT)?
        | MOVE(bitWidth=BIT_WIDTH) LSQUARE (baseReg=REGISTER) PLUS_SIGN (value=HEX_NUMBER) RSQUARE COMMA (sourceReg=REGISTER) (increment=INCREMENT)?;
+opCodeC0: (cond=CONDITIONAL)(bitWidth=BIT_WIDTH) (source=REGISTER) COMMA LSQUARE (memType=MEM_TYPE) PLUS_SIGN (offset=HEX_NUMBER) RSQUARE
+        | (cond=CONDITIONAL)(bitWidth=BIT_WIDTH) (source=REGISTER) COMMA LSQUARE (memType=MEM_TYPE) PLUS_SIGN (offsetReg=REGISTER) RSQUARE
+		| (cond=CONDITIONAL)(bitWidth=BIT_WIDTH) (source=REGISTER) COMMA LSQUARE (addrReg=REGISTER) PLUS_SIGN (offset=HEX_NUMBER) RSQUARE
+		| (cond=CONDITIONAL)(bitWidth=BIT_WIDTH) (source=REGISTER) COMMA LSQUARE (addrReg=REGISTER) PLUS_SIGN (offsetReg=REGISTER) RSQUARE
+		| (cond=CONDITIONAL)(bitWidth=BIT_WIDTH) (source=REGISTER) COMMA (value=HEX_NUMBER)
+		| (cond=CONDITIONAL)(bitWidth=BIT_WIDTH) (source=REGISTER) COMMA (otherReg=REGISTER);
 
 // opcodes
 MOVE: 'mov';

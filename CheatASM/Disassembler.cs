@@ -90,6 +90,21 @@ namespace CheatASM
                     default:
                         Debugger.Break();
                         break;
+                    case 'B':
+                        /* reserved */
+                        break;
+                    case 'C':
+                        /* Extended width set 1 */
+                        switch(line[1])
+                        {
+                            case '0':
+                                /* Compare register */
+                                op = new RegisterConditionalOpcode(blocks);
+                                WriteOpcode(op, sb);
+                                conditionalIndent++;
+                                break;
+                        }
+                        break;
                 }
             }
             catch (Exception ex)

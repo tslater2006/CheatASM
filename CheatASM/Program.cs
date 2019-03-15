@@ -30,6 +30,10 @@ namespace CheatASM
                     /* process replLines */
                     foreach (var l in replLines)
                     {
+                        if (l.Length == 0)
+                        {
+                            continue;
+                        }
                         if (Regex.IsMatch(l, "^([0-9a-fA-F]{8}\\s?){1,4}$"))
                         {
                             Console.WriteLine(disasm.DisassembleLine(l));

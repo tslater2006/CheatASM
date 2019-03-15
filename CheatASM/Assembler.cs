@@ -188,15 +188,15 @@ namespace CheatASM
                 op = opTyped;
 
                 opTyped.BitWidth = Enum.Parse<BitWidthType>(opCtx.bitWidth.Text, true);
-                opTyped.RegisterDest = uint.Parse(opCtx.dest.Text.Substring(1));
+                opTyped.RegisterDest = Convert.ToUInt16(opCtx.dest.Text.Substring(1), 16);
                 opTyped.MathType = Enum.Parse<RegisterArithmeticType>(opCtx.func.Text, true);
 
-                opTyped.RegisterLeft = uint.Parse(opCtx.leftReg.Text.Substring(1));
+                opTyped.RegisterLeft = Convert.ToUInt16(opCtx.leftReg.Text.Substring(1), 16);
 
                 if (opCtx.rightReg != null)
                 {
                     opTyped.RightHandRegister = true;
-                    opTyped.RegisterRight = uint.Parse(opCtx.rightReg.Text.Substring(1));
+                    opTyped.RegisterRight = Convert.ToUInt16(opCtx.rightReg.Text.Substring(1), 16);
                 }
                 else
                 {
@@ -232,6 +232,55 @@ namespace CheatASM
 
                 }
 
+            } else if (stmt.opCodeC0() != null)
+            {
+                OpCodeC0Context opCtx = stmt.opCodeC0();
+                RegisterConditionalOpcode opTyped = new RegisterConditionalOpcode();
+                op = opTyped;
+
+                opTyped.BitWidth = Enum.Parse<BitWidthType>(opCtx.bitWidth.Text, true);
+                opTyped.Condition = Enum.Parse<ConditionalComparisonType>(opCtx.cond.Text, true);
+                opTyped.SourceRegister = Convert.ToUInt16(opCtx.source.Text.Substring(1), 16);
+                if (opCtx.memType != null)
+                {
+                    opTyped.MemType = Enum.Parse<MemoryAccessType>(opCtx.memType.Text, true);
+                    
+                    /* operand type is either 0 or 1... */
+                    if (opCtx.offset != null)
+                    {
+                        opTyped.RelativeAddress = Convert.ToUInt64(opCtx.offset.Text, 16);
+                        opTyped.OperandType = 0;
+                    } else if (opCtx.offsetReg != null)
+                    {
+                        opTyped.OffsetRegister = Convert.ToUInt16(opCtx.offsetReg.Text.Substring(1), 16);
+                        opTyped.OperandType = 1;
+                    }
+                } else if (opCtx.addrReg != null)
+                {
+                    /* operand type is either 2 or 3 */
+                    if (opCtx.offset != null)
+                    {
+                        opTyped.RelativeAddress = Convert.ToUInt64(opCtx.offset.Text, 16);
+                        opTyped.OperandType = 2;
+                    }
+                    else if (opCtx.offsetReg != null)
+                    {
+                        opTyped.OffsetRegister = Convert.ToUInt16(opCtx.offsetReg.Text.Substring(1), 16);
+                        opTyped.OperandType = 3;
+                    }
+                } else if (opCtx.value != null)
+                {
+                    opTyped.Value = Convert.ToUInt64(opCtx.value.Text, 16);
+                    opTyped.OperandType = 4;
+                } else if (opCtx.otherReg != null)
+                {
+                    opTyped.OtherRegister  = Convert.ToUInt16(opCtx.otherReg.Text.Substring(1), 16);
+                    opTyped.OperandType = 5;
+                } else
+                {
+                    throw new NotSupportedException();
+                }
+                
             }
 
             return op.ToByteString();

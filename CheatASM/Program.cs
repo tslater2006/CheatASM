@@ -6,11 +6,61 @@ using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Text;
+using System.Text.RegularExpressions;
 
 namespace CheatASM
 {
     class Program
     {
+        static void RunREPL()
+        {
+            Console.Clear();
+            bool run = true;
+            Console.WriteLine("CheatASM REPL Started.");
+            Console.WriteLine("Enter blank line to execute, enter quit() to stop REPL.");
+            List<string> replLines = new List<string>();
+           
+            while(run) {
+                Console.Write(">> ");
+                var line = Console.ReadLine();
+                if (line.Length == 0)
+                {
+                    Disassembler disasm = new Disassembler();
+                    Assembler asm = new Assembler();
+                    /* process replLines */
+                    foreach (var l in replLines)
+                    {
+                        if (Regex.IsMatch(l, "^([0-9a-fA-F]{8}\\s?){1,4}$"))
+                        {
+                            Console.WriteLine(disasm.DisassembleLine(l));
+                        }
+                        else
+                        {
+                            if (l.Trim().StartsWith("["))
+                            {
+                                /* Cheat header probably? */
+                                Console.WriteLine(l);
+                            }
+                            else
+                            {
+                                Console.WriteLine(asm.AssembleLine(l));
+                            }
+                        }
+                    }
+                    replLines.Clear();
+                }
+                if (line.ToLower().Contains("quit"))
+                {
+                    run = false;
+                    continue;
+                } else
+                {
+                    /* just add to list to process, we'll handle what to do later */
+                    replLines.Add(line.Trim());
+                }
+            }
+        }
+
         static void Main(string[] args)
         {
             bool help = false;
@@ -21,6 +71,7 @@ namespace CheatASM
             bool recursive = false;
             bool verbose = false;
             string text = "";
+            bool repl = false;
             OptionSet optSet = new OptionSet();
             optSet.Add("?|help|h", "Prints out the options.", option => help = option != null);
             optSet.Add("d|disassemble", "Disassembler mode.", option => disassemble = option != null);
@@ -30,8 +81,16 @@ namespace CheatASM
             optSet.Add("t=|text=", "String to dis/assemble.", option => text = option);
             optSet.Add("r|recursive", "Process directory recursively.", option => recursive = option != null);
             optSet.Add("v|verbose", "Verbose Logging.", option => verbose = option != null);
-
+            optSet.Add("repl", "REPL mode", option => repl = option != null);
             optSet.Parse(args);
+
+            if (repl)
+            {
+                RunREPL();
+                return;
+            }
+
+            /* movd [MAIN+R1+0x6C7634], 0x98967F */
 
             if (assemble && disassemble)
             {

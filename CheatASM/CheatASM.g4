@@ -38,14 +38,14 @@ opCodeC0: (cond=CONDITIONAL)(bitWidth=BIT_WIDTH) (source=REGISTER) COMMA LSQUARE
 		| (cond=CONDITIONAL)(bitWidth=BIT_WIDTH) (source=REGISTER) COMMA (value=HEX_NUMBER)
 		| (cond=CONDITIONAL)(bitWidth=BIT_WIDTH) (source=REGISTER) COMMA (otherReg=REGISTER);
 
-// opcodes
-MOVE: 'mov';
+// Lexer Rules
+MOVE: M O V;
 CONDITIONAL: GT | GE | LT | LE | EQ | NE;
-LOOP: 'loop';
-END_LOOP: 'endloop';
-KEYCHECK: 'keycheck';
-END_COND: 'endcond';
-INCREMENT: 'inc';
+LOOP: L O O P;
+END_LOOP: E N D L O O P;
+KEYCHECK: K E Y C H E C K;
+END_COND: E N D C O N D;
+INCREMENT: I N C;
 LSQUARE: '[';
 RSQUARE: ']';
 LCURL: '{';
@@ -55,71 +55,101 @@ COMMA: ',';
 // memory types
 
 MEM_TYPE: MEMORY_HEAP | MEMORY_MAIN;
-MEMORY_MAIN: 'MAIN';
-MEMORY_HEAP: 'HEAP';
+MEMORY_MAIN: M A I N;
+MEMORY_HEAP: H E A P;
 
 BIT_WIDTH: BIT_BYTE | BIT_WORD | BIT_DOUBLE | BIT_QUAD;
-BIT_BYTE: 'b';
-BIT_WORD: 'w';
-BIT_DOUBLE: 'd';
-BIT_QUAD: 'q';
+BIT_BYTE: B;
+BIT_WORD: W;
+BIT_DOUBLE: D;
+BIT_QUAD: Q;
 
 
 // comparisons
-GT: 'gt';
-GE: 'ge';
-LT: 'lt';
-LE: 'le';
-EQ: 'eq';
-NE:'ne';
+GT: G T;
+GE: G E;
+LT: L T;
+LE: L E;
+EQ: E Q;
+NE: N E;
 
 // arithmetic
 LEGACY_ARITHMETIC: ADD | SUB | MUL | LSH | RSH ;
 ARTIHMETIC: LEGACY_ARITHMETIC | AND | OR | NOT | XOR | NONE;
 
-ADD: 'add';
-SUB: 'sub';
-MUL: 'mul';
-LSH: 'lsh';
-RSH: 'rsh';
-AND: 'and';
-OR: 'or';
-NOT: 'not';
-XOR: 'xor';
-NONE: 'none';
+ADD: A D D;
+SUB: S U B;
+MUL: M U L;
+LSH: L S H;
+RSH: R S H;
+AND: A N D;
+OR: O R;
+NOT: N O T;
+XOR: X O R;
+NONE: N O N E;
 
 // keys
-KEY: A | B | X | Y | LSP | RSP | L | R | ZL | ZR | PLUS | MINUS | LEFT | UP | RIGHT | DOWN | LSL | LSU | LSR | LSD | RSL | RSU | RSR | RSD | SL | SR;
-A: 'A';
-B: 'B';
-X: 'X';
-Y: 'Y';
-LSP: 'LSP';
-RSP: 'RSP';
-L: 'L';
-R: 'R';
-ZL: 'ZL';
-ZR: 'ZR';
-PLUS: 'PLUS';
-MINUS: 'MINUS';
-LEFT: 'LEFT';
-UP: 'UP';
-RIGHT: 'RIGHT';
-DOWN: 'DOWN';
-LSL: 'LSL';
-LSU: 'LSU';
-LSR: 'LSR';
-LSD: 'LSD';
-RSL: 'RSL';
-RSU: 'RSU';
-RSR: 'RSR';
-RSD: 'RSD';
-SL: 'SL';
-SR: 'SR';
+KEY: A_KEY | B_KEY | X_KEY | Y_KEY | LSP_KEY | RSP_KEY | L_KEY 
+   | R_KEY | ZL_KEY | ZR_KEY | PLUS_KEY | MINUS_KEY | LEFT_KEY 
+   | UP_KEY | RIGHT_KEY | DOWN_KEY | LSL_KEY | LSU_KEY | LSR_KEY 
+   | LSD_KEY | RSL_KEY | RSU_KEY | RSR_KEY | RSD_KEY | SL_KEY | SR_KEY;
+A_KEY: A;
+B_KEY: B;
+X_KEY: X;
+Y_KEY: Y;
+LSP_KEY: L S P;
+RSP_KEY: R S P;
+L_KEY: L;
+R_KEY: R;
+ZL_KEY: Z L;
+ZR_KEY: Z R;
+PLUS_KEY: P L U S;
+MINUS_KEY: M I N U S;
+LEFT_KEY: L E F T;
+UP_KEY: U P;
+RIGHT_KEY: R I G H T;
+DOWN_KEY: D O W N;
+LSL_KEY: L S L;
+LSU_KEY: L S U;
+LSR_KEY: L S R;
+LSD_KEY: L S D;
+RSL_KEY: R S L;
+RSU_KEY: R S U;
+RSR_KEY: R S R;
+RSD_KEY: R S D;
+SL_KEY: S L;
+SR_KEY: S R;
 
 REGISTER: [Rr][0-9a-fA-F];
-HEX_NUMBER: '0x'[0-9a-fA-F]+;
+HEX_NUMBER: '0' X [0-9a-fA-F]+;
 WS: [ \t\r\n]+ -> skip;
-MASTER_CODE: '{' [0-9a-fA-F]+ '}';
-CHEAT_ENTRY: '[' [0-9a-fA-F]+ ']';
+MASTER_CODE: '{' [0-9a-zA-Z]+ '}';
+CHEAT_ENTRY: '[' [0-9a-zA-Z]+ ']';
 COMMENT: '#'.* -> skip;
+
+fragment A : [aA]; // match either an 'a' or 'A'
+fragment B : [bB];
+fragment C : [cC];
+fragment D : [dD];
+fragment E : [eE];
+fragment F : [fF];
+fragment G : [gG];
+fragment H : [hH];
+fragment I : [iI];
+fragment J : [jJ];
+fragment K : [kK];
+fragment L : [lL];
+fragment M : [mM];
+fragment N : [nN];
+fragment O : [oO];
+fragment P : [pP];
+fragment Q : [qQ];
+fragment R : [rR];
+fragment S : [sS];
+fragment T : [tT];
+fragment U : [uU];
+fragment V : [vV];
+fragment W : [wW];
+fragment X : [xX];
+fragment Y : [yY];
+fragment Z : [zZ];

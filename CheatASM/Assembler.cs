@@ -212,26 +212,56 @@ namespace CheatASM
                 op = opTyped;
 
                 opTyped.BitWidth = Enum.Parse<BitWidthType>(opCtx.bitWidth.Text, true);
-                opTyped.RegisterBase = uint.Parse(opCtx.baseReg.Text.Substring(1));
-                opTyped.RegisterToWrite = uint.Parse(opCtx.sourceReg.Text.Substring(1));
+                if (opCtx.baseReg != null)
+                {
+                    opTyped.AddressRegister = uint.Parse(opCtx.baseReg.Text.Substring(1));
+                }
+                opTyped.SourceRegister = uint.Parse(opCtx.sourceReg.Text.Substring(1));
                 if (opCtx.increment != null)
                 {
                     opTyped.IncrementFlag = true;
                 }
                 opTyped.OffsetType = 0;
-                if (opCtx.regIndex !=null)
+
+                if (opCtx.memType != null)
                 {
-                    opTyped.OffsetType = 1;
-                    opTyped.RegIndex1 = uint.Parse(opCtx.regIndex.Text.Substring(1));
+                    opTyped.MemType = Enum.Parse<MemoryAccessType>(opCtx.memType.Text);
+                    /* has to be OffsetType 3,4,5 */
+                    bool hasReg = opCtx.baseReg != null;
+                    bool hasVal = opCtx.value != null;
+
+                    if (hasReg && hasVal)
+                    {
+                        /* type 5 */
+                        opTyped.OffsetType = 5;
+                        opTyped.OffsetRegister = Convert.ToUInt16(opCtx.baseReg.Text.Substring(1),16);
+                        opTyped.RelativeAddress = Convert.ToUInt64(opCtx.value.Text,16);
+                    } else if (hasReg)
+                    {
+                        /* type 3 */
+                        opTyped.OffsetType = 3;
+                        opTyped.OffsetRegister = Convert.ToUInt16(opCtx.baseReg.Text.Substring(1),16);
+                    } else if (hasVal)
+                    {
+                        /* type 4 */
+                        opTyped.OffsetType = 4;
+                        opTyped.RelativeAddress = Convert.ToUInt64(opCtx.value.Text,16);
+                    }
                 }
-                if (opCtx.value != null)
+                else
                 {
-                    opTyped.OffsetType = 2;
-
-                    opTyped.Value = Convert.ToUInt64(opCtx.value.Text);
-
+                    /* has to be OffsetType 1,2 */
+                    if (opCtx.regIndex != null)
+                    {
+                        opTyped.OffsetType = 1;
+                        opTyped.OffsetRegister = Convert.ToUInt16(opCtx.regIndex.Text.Substring(1),16);
+                    }
+                    if (opCtx.value != null)
+                    {
+                        opTyped.OffsetType = 2;
+                        opTyped.RelativeAddress = Convert.ToUInt64(opCtx.value.Text,16);
+                    }
                 }
-
             } else if (stmt.opCodeC0() != null)
             {
                 OpCodeC0Context opCtx = stmt.opCodeC0();

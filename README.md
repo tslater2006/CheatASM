@@ -71,7 +71,78 @@ CheatASM -a -t "movd [MAIN+R1+0x6C7634], 0x98967F"
 
 ## Assembly Mnemonics
 
-TBD
+The desire is for the assembly mnemonics to not be something you need to memorize or reference often. The aim is to be as intuitive as possible (assuming you have assembly exposure) and just let you write what you need. There are some general patterns that hte mnemonics follow:
+
+`command(bitwidth) param1, param2`
+
+Command can be something like "mov" or "add", BitWidth is one of the following: "b", "w", "d", "q" for Byte, Word, Dword, Qword respectively.
+
+When using the more complex addressing modes the order that items should be specified is always `MemoryType -> Register -> Literal value`.
+
+### OpCode Mnemonic Listing
+
+Below you will find examples of every mnemonic supported by CheatASM. To find out what each opcode does, please reference the Atmosphere Cheat docs.
+
+#### Opcode 0 (Store Static)
+
+Moves 0x1234 to the QWORD at HEAP+R0+0x1234
+
+```
+movq [HEAP+R0+0x1234], 0x1234
+```
+
+#### Opcode 1 (Conditional)
+
+Compares the byte at HEAP+0x1234 and enters the conditional block if it is less than 0x12.
+
+```
+ltb [HEAP+0x1234], 0x12
+   ...
+endcond
+```
+
+#### Opcode 2 (End Conditional)
+
+Terminates a conditional block
+
+```
+endcond
+```
+
+#### Opcode 3 (Begin/End Loop)
+
+```
+loop R0, 0x23
+   ...
+endloop R0
+```
+
+#### Opcode 4 (Static to Register)
+
+Moves a static value into a register (bitwidth is always q)
+
+```
+moveq R0, 0x1234
+```
+
+#### Opcode 5 (Memory to Register)
+
+Move a value from memory into a register
+
+```
+movb R0, [HEAP+0x1234]
+movw R0, [R0+0x1234] 
+```
+
+#### Opcode 6 (Static to Address)
+
+```
+movq [R0], 0x1234
+movq [R0], 0x1234 inc
+
+movq [R0+R2], 0x1234
+movq [R0+R2], 0x1234 inc
+```
 
 ## Building From Source
 

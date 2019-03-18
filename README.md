@@ -144,6 +144,40 @@ movq [R0+R2], 0x1234
 movq [R0+R2], 0x1234 inc
 ```
 
+#### Opcode 7 (Legacy Arithmetic)
+
+Supported arithmetic methods are `add, sub, mul, lsh, rsh`
+
+```
+<arithmetic_method>q R0, 0x1234
+```
+
+#### Opcode 8  (KeyCheck)
+
+Supported keys are: `A, B, X, Y, LSP, RSP, L, R, ZL, ZR, PLUS, MINUS, LEFT, UP, RIGHT, DOWN, LSL, LSU, LSR, LSD, RSL, RSU, RSR,RSD, SL, and SR`
+
+```
+keycheck <key>
+```
+
+
+#### Opcode 9 (Arithmetic)
+
+Supported arithmetic methods are `add, sub, mul, lsh, rsh, and, or, not, xor, none`
+
+```
+<arithmetic_method>q R0, R1, R2
+<arithmetic_method>q R0, R1, 0x1234
+```
+
+#### Opcode 10 (Register to Address)
+
+TBD
+
+#### Extended Opcode 0xC0 (Register Conditional)
+
+TBD
+
 ## Building From Source
 
 ### Ubuntu 18.04

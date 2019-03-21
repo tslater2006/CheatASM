@@ -83,7 +83,7 @@ namespace CheatASM
             StringBuilder sb = new StringBuilder();
 
             sb.Append(Enum.GetName(typeof(ConditionalComparisonType), Condition));
-            sb.Append(Enum.GetName(typeof(BitWidthType), BitWidth));
+            sb.Append(".").Append(Enum.GetName(typeof(BitWidthType), BitWidth));
             sb.Append(" ");
             switch(OperandType)
             {

@@ -21,7 +21,7 @@ namespace CheatASM
 
         public override string ToASM()
         {
-            return "movq R" + RegisterIndex.ToString("X") + ", 0x" + Value.ToString("X");
+            return "mov.q R" + RegisterIndex.ToString("X") + ", 0x" + Value.ToString("X");
         }
 
         public override string ToByteString()

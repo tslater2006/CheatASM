@@ -48,7 +48,7 @@ namespace CheatASM
         {
             StringBuilder sb = new StringBuilder();
             sb.Append(Enum.GetName(typeof(RegisterArithmeticType), MathType));
-            sb.Append(Enum.GetName(typeof(BitWidthType), BitWidth));
+            sb.Append(".").Append(Enum.GetName(typeof(BitWidthType), BitWidth));
             sb.Append(" R").Append(RegisterDest.ToString("X"));
             sb.Append(", R").Append(RegisterLeft.ToString("X"));
             if (RightHandRegister)

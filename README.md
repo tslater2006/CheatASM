@@ -27,8 +27,8 @@ For running from source, see the "Building" section below
 becomes
 
 ```
-ltb [HEAP+0x56C04A6C], 0xA
-  movb [HEAP+R0+0x56C04A6C], 0xA
+lt.b [HEAP+0x56C04A6C], 0xA
+  mov.b [HEAP+R0+0x56C04A6C], 0xA
 endcond
 ```
 
@@ -66,7 +66,7 @@ CheatASM -d -t "04010000 006C7634 0098967F"
 `
 
 `
-CheatASM -a -t "movd [MAIN+R1+0x6C7634], 0x98967F"
+CheatASM -a -t "mov.d [MAIN+R1+0x6C7634], 0x98967F"
 `
 
 ## Assembly Mnemonics
@@ -88,7 +88,7 @@ Below you will find examples of every mnemonic supported by CheatASM. To find ou
 Moves 0x1234 to the QWORD at HEAP+R0+0x1234
 
 ```
-movq [HEAP+R0+0x1234], 0x1234
+mov.q [HEAP+R0+0x1234], 0x1234
 ```
 
 #### Opcode 1 (Conditional)
@@ -96,7 +96,7 @@ movq [HEAP+R0+0x1234], 0x1234
 Compares the byte at HEAP+0x1234 and enters the conditional block if it is less than 0x12.
 
 ```
-ltb [HEAP+0x1234], 0x12
+lt.b [HEAP+0x1234], 0x12
    ...
 endcond
 ```
@@ -122,7 +122,8 @@ endloop R0
 Moves a static value into a register (bitwidth is always q)
 
 ```
-moveq R0, 0x1234
+mov R0, 0x1234
+mov.q R0, 0x1234
 ```
 
 #### Opcode 5 (Memory to Register)
@@ -130,18 +131,18 @@ moveq R0, 0x1234
 Move a value from memory into a register
 
 ```
-movb R0, [HEAP+0x1234]
-movw R0, [R0+0x1234] 
+mov.b R0, [HEAP+0x1234]
+mov.w R0, [R0+0x1234] 
 ```
 
 #### Opcode 6 (Static to Address)
 
 ```
-movq [R0], 0x1234
-movq [R0], 0x1234 inc
+mov.q [R0], 0x1234
+mov.q [R0], 0x1234 inc
 
-movq [R0+R2], 0x1234
-movq [R0+R2], 0x1234 inc
+mov.q [R0+R2], 0x1234
+mov.q [R0+R2], 0x1234 inc
 ```
 
 #### Opcode 7 (Legacy Arithmetic)
@@ -149,7 +150,7 @@ movq [R0+R2], 0x1234 inc
 Supported arithmetic methods are `add, sub, mul, lsh, rsh`
 
 ```
-<arithmetic_method>q R0, 0x1234
+add.q R0, 0x1234
 ```
 
 #### Opcode 8  (KeyCheck)
@@ -166,8 +167,8 @@ keycheck <key>
 Supported arithmetic methods are `add, sub, mul, lsh, rsh, and, or, not, xor, none`
 
 ```
-<arithmetic_method>q R0, R1, R2
-<arithmetic_method>q R0, R1, 0x1234
+add.q R0, R1, R2
+add.q R0, R1, 0x1234
 ```
 
 #### Opcode 10 (Register to Address)

@@ -38,7 +38,7 @@ namespace CheatASM
         {
             StringBuilder sb = new StringBuilder();
             sb.Append(Enum.GetName(typeof(ConditionalComparisonType), Condition));
-            sb.Append(Enum.GetName(typeof(BitWidthType), BitWidth));
+            sb.Append(".").Append(Enum.GetName(typeof(BitWidthType), BitWidth));
             sb.Append(" [").Append(Enum.GetName(typeof(MemoryAccessType), MemType));
             sb.Append("+0x").Append(Immediate.ToString("X"));
             sb.Append("], 0x").Append(Value.ToString("X"));

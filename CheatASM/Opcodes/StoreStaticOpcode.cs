@@ -37,7 +37,7 @@ namespace CheatASM
         {
             StringBuilder sb = new StringBuilder();
             sb.Append("mov");
-            sb.Append(Enum.GetName(typeof(BitWidthType), BitWidth));
+            sb.Append(".").Append(Enum.GetName(typeof(BitWidthType), BitWidth));
 
             sb.Append(" [");
 

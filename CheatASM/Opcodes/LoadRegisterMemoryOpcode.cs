@@ -39,7 +39,7 @@ namespace CheatASM
             /* mov(b/w/d/q) R0 [R0+IMM] */
             StringBuilder sb = new StringBuilder();
             sb.Append("mov");
-            sb.Append(Enum.GetName(typeof(BitWidthType), BitWidth));
+            sb.Append(".").Append(Enum.GetName(typeof(BitWidthType), BitWidth));
 
             sb.Append(" R" + RegisterIndex.ToString("X")).Append(", [");
             if (UseReg)

@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "CheatASM": {
+      "commandName": "Project",
+      "commandLineArgs": "-repl"
+    }
+  }
+}

@@ -33,7 +33,7 @@ namespace CheatASM
             /* mov(b/w/d/q) [R0 (+R2)] Value (inc) */
             StringBuilder sb = new StringBuilder();
 
-            sb.Append("mov").Append(Enum.GetName(typeof(BitWidthType), BitWidth));
+            sb.Append("mov.").Append(Enum.GetName(typeof(BitWidthType), BitWidth));
             sb.Append(" [R").Append(RegisterIndex.ToString("X"));
             if (OffsetEnableFlag)
             {

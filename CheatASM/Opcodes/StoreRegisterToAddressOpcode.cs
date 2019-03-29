@@ -53,7 +53,7 @@ namespace CheatASM
         public override string ToASM()
         {
             StringBuilder sb = new StringBuilder();
-            sb.Append("mov").Append(Enum.GetName(typeof(BitWidthType), BitWidth));
+            sb.Append("mov.").Append(Enum.GetName(typeof(BitWidthType), BitWidth));
 
             switch (OffsetType)
             {

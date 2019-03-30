@@ -23,7 +23,8 @@ opCode3: LOOP (register=REGISTER) COMMA(value=HEX_NUMBER)
 opCode4: MOVE (DOT BIT_WIDTH)? (register=REGISTER) COMMA (value=HEX_NUMBER);
 opCode5: MOVE DOT (bitWidth=BIT_WIDTH) (register=REGISTER) COMMA LSQUARE (memType=MEM_TYPE) PLUS_SIGN (offset=HEX_NUMBER) RSQUARE
        |  MOVE DOT (bitWidth=BIT_WIDTH) (register=REGISTER) COMMA LSQUARE (baseRegister=REGISTER) PLUS_SIGN (offset=HEX_NUMBER) RSQUARE;
-opCode6: MOVE DOT (bitWidth=BIT_WIDTH) LSQUARE (register=REGISTER)(PLUS_SIGN(offsetReg=REGISTER))? RSQUARE COMMA (value=HEX_NUMBER) (increment=INCREMENT)?;
+opCode6: MOVE DOT (bitWidth=BIT_WIDTH) LSQUARE (register=REGISTER) PLUS_SIGN(offsetReg=REGISTER) RSQUARE COMMA (value=HEX_NUMBER) (increment=INCREMENT)?
+       | MOVE DOT (bitWidth=BIT_WIDTH) LSQUARE (register=REGISTER) RSQUARE COMMA (value=HEX_NUMBER);
 opCode7: (func=LEGACY_ARITHMETIC) DOT (bitWidth=BIT_WIDTH) (register=REGISTER) COMMA (value=HEX_NUMBER);
 opCode8: KEYCHECK (key=KEY);
 opCode9: (func=ARTIHMETIC) DOT (bitWidth=BIT_WIDTH) (dest=REGISTER) COMMA (leftReg=REGISTER) COMMA (rightReg=REGISTER)
@@ -127,8 +128,6 @@ SR_KEY: S R;
 REGISTER: [Rr][0-9a-fA-F];
 HEX_NUMBER: '0' X [0-9a-fA-F]+;
 WS: [ \t\r\n]+ -> skip;
-MASTER_CODE: '{' [0-9a-zA-Z]+ '}';
-CHEAT_ENTRY: '[' [0-9a-zA-Z]+ ']';
 COMMENT: '#'.* -> skip;
 DOT: '.';
 fragment A : [aA]; // match either an 'a' or 'A'

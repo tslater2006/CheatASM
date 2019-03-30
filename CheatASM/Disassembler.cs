@@ -41,14 +41,20 @@ namespace CheatASM
                         break;
                     case '2':
                         op = new EndConditionalOpcode(blocks);
-                        conditionalIndent--;
+                        if (conditionalIndent > 0)
+                        {
+                            conditionalIndent--;
+                        }
                         WriteOpcode(op, sb);
                         break;
                     case '3':
                         op = new LoopOpcode(blocks);
                         if (((LoopOpcode)op).IsEnd)
                         {
-                            conditionalIndent--;
+                            if (conditionalIndent > 0)
+                            {
+                                conditionalIndent--;
+                            }
                         }
                         WriteOpcode(op, sb);
                         if (((LoopOpcode)op).IsEnd == false)

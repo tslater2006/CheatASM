@@ -67,10 +67,10 @@ namespace CheatASM
             uint[] blocks = null;
             if (BitWidth == BitWidthType.q)
             {
-                blocks = new uint[4];
+                blocks = new uint[3];
             } else
             {
-                blocks = new uint[3];
+                blocks = new uint[2];
             }
 
             SetNibble(ref blocks[0], 1, 9);

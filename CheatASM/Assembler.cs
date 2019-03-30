@@ -201,7 +201,7 @@ namespace CheatASM
                 else
                 {
                     opTyped.RightHandRegister = false;
-                    opTyped.Value = opTyped.Value = Convert.ToUInt64(opCtx.value.Text);
+                    opTyped.Value = opTyped.Value = Convert.ToUInt64(opCtx.value.Text,16);
                 }
 
             }

@@ -154,7 +154,14 @@ namespace CheatASM
                 blocks = new uint[2];
             } else if (OperandType == 4)
             {
-                blocks = new uint[3];
+                if (BitWidth == BitWidthType.q)
+                {
+                    blocks = new uint[3];
+                }
+                else
+                {
+                    blocks = new uint[2];
+                }
             } else
             {
                 blocks = new uint[1];

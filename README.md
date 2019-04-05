@@ -79,6 +79,29 @@ Command can be something like "mov" or "add", BitWidth is one of the following: 
 
 When using the more complex addressing modes the order that items should be specified is always `MemoryType -> Register -> Literal value`.
 
+### Available patterns for "mov" instructions
+
+Below is a summary of the allowed combinations of the 'mov' instruction:
+
+```
+mov.d [MEM_TYPE + reg + num], num
+
+mov.d reg, num
+
+mov.d reg, [MEM_TYPE + num]
+mov.d reg, [reg + num]
+
+mov.d [reg], number 
+mov.d [reg + reg], number
+
+mov.d [reg], reg
+mov.d [reg + reg], reg
+mov.d [reg + num], reg
+mov.d [MEM_TYPE + reg], reg
+mov.d [MEM_TYPE + num], reg
+mov.d [MEM_TYPE + reg + num], reg
+```
+
 ### OpCode Mnemonic Listing
 
 Below you will find examples of every mnemonic supported by CheatASM. To find out what each opcode does, please reference the Atmosphere Cheat docs.

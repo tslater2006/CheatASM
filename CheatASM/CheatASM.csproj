@@ -19,5 +19,8 @@
     <!-- This is the required reference which is missing from your project file -->
     <PackageReference Include="Antlr4" Version="4.6.6" />
   </ItemGroup>
+  <ItemGroup>
+    <Folder Include="examples\" />
+  </ItemGroup>
 
 </Project>

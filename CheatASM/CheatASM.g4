@@ -1,46 +1,91 @@
 ﻿grammar CheatASM;
 
-statementList: statement+;
+program: gameInfo? titleID? buildID? variableDecl* cheatEntry+
+       | variableDecl* statement+;
 
-statement: opCode0
-         | opCode1
+statement: opCode1
          | opCode2
          | opCode3
          | opCode4
          | opCode5
-         | opCode6
          | opCode7
          | opCode8
          | opCode9
-         | opCodeA
-		 | opCodeC0;
+         | movInstr
+		 | opCodeC0
+		 | opCodeC1
+		 | opCodeC2;
 
-opCode0: MOVE DOT (bitWidth=BIT_WIDTH) LSQUARE (memType=MEM_TYPE)PLUS_SIGN(register=REGISTER)PLUS_SIGN(offset=HEX_NUMBER) RSQUARE COMMA (value=HEX_NUMBER);
-opCode1: (cond=CONDITIONAL) DOT (bitWidth=BIT_WIDTH) LSQUARE(memType=MEM_TYPE)PLUS_SIGN(offset=HEX_NUMBER)RSQUARE COMMA (value=HEX_NUMBER);
+cheatEntry: (header=cheatHeader) statement+;
+
+titleID: DOT 'title'  (title=ID);
+buildID: DOT 'build'  (build=ID);
+gameInfo: DOT 'gameinfo' (info=CHEAT_NAME);
+
+cheatHeader: DOT 'cheat'  (master=MASTER)? (name=CHEAT_NAME);
+
+/* cond.d [HEAP + num], num */
+opCode1: (cond=CONDITIONAL) DOT (bitWidth=BIT_WIDTH) LSQUARE(memType=MEM_TYPE)PLUS_SIGN(offset=numRef)RSQUARE COMMA (value=numRef);
 opCode2: END_COND;
-opCode3: LOOP (register=REGISTER) COMMA(value=HEX_NUMBER)
-       | (endloop=END_LOOP) (register=REGISTER);
-opCode4: MOVE (DOT BIT_WIDTH)? (register=REGISTER) COMMA (value=HEX_NUMBER);
-opCode5: MOVE DOT (bitWidth=BIT_WIDTH) (register=REGISTER) COMMA LSQUARE (memType=MEM_TYPE) PLUS_SIGN (offset=HEX_NUMBER) RSQUARE
-       |  MOVE DOT (bitWidth=BIT_WIDTH) (register=REGISTER) COMMA LSQUARE (baseRegister=REGISTER) PLUS_SIGN (offset=HEX_NUMBER) RSQUARE;
-opCode6: MOVE DOT (bitWidth=BIT_WIDTH) LSQUARE (register=REGISTER)(PLUS_SIGN(offsetReg=REGISTER))? RSQUARE COMMA (value=HEX_NUMBER) (increment=INCREMENT)?;
-opCode7: (func=ARITHMETIC) DOT (bitWidth=BIT_WIDTH) (register=REGISTER) COMMA (value=HEX_NUMBER);
-opCode8: KEYCHECK (key=KEY);
-opCode9: (func=ARITHMETIC) DOT (bitWidth=BIT_WIDTH) (dest=REGISTER) COMMA (leftReg=REGISTER) COMMA (rightReg=REGISTER)
-       | (func=ARITHMETIC) DOT (bitWidth=BIT_WIDTH) (dest=REGISTER) COMMA (leftReg=REGISTER) COMMA (value=HEX_NUMBER);
-opCodeA: MOVE DOT (bitWidth=BIT_WIDTH) LSQUARE (baseReg=REGISTER) RSQUARE COMMA (sourceReg=REGISTER) (increment=INCREMENT)?
-       | MOVE DOT (bitWidth=BIT_WIDTH) LSQUARE (baseReg=REGISTER) PLUS_SIGN (regIndex=REGISTER) RSQUARE COMMA (sourceReg=REGISTER) (increment=INCREMENT)?
-       | MOVE DOT (bitWidth=BIT_WIDTH) LSQUARE (baseReg=REGISTER) PLUS_SIGN (value=HEX_NUMBER) RSQUARE COMMA (sourceReg=REGISTER) (increment=INCREMENT)?
-	   | MOVE DOT (bitWidth=BIT_WIDTH) LSQUARE (memType=MEM_TYPE) PLUS_SIGN (baseReg=REGISTER) RSQUARE COMMA (sourceReg=REGISTER) (increment=INCREMENT)?
-	   | MOVE DOT (bitWidth=BIT_WIDTH) LSQUARE (memType=MEM_TYPE) PLUS_SIGN (value=HEX_NUMBER) RSQUARE COMMA (sourceReg=REGISTER) (increment=INCREMENT)?
-	   | MOVE DOT (bitWidth=BIT_WIDTH) LSQUARE (memType=MEM_TYPE) PLUS_SIGN (baseReg=REGISTER) PLUS_SIGN (value=HEX_NUMBER) RSQUARE COMMA (sourceReg=REGISTER) (increment=INCREMENT)?;
+opCode3: LOOP (register=regRef) COMMA(value=numRef)
+       | (endloop=END_LOOP) (register=regRef);
+/* mov.d reg, num */
+opCode4: MOVE (DOT BIT_WIDTH)? (register=regRef) COMMA (value=numRef);
 
-opCodeC0: (cond=CONDITIONAL) DOT (bitWidth=BIT_WIDTH) (source=REGISTER) COMMA LSQUARE (memType=MEM_TYPE) PLUS_SIGN (offset=HEX_NUMBER) RSQUARE
-        | (cond=CONDITIONAL) DOT (bitWidth=BIT_WIDTH) (source=REGISTER) COMMA LSQUARE (memType=MEM_TYPE) PLUS_SIGN (offsetReg=REGISTER) RSQUARE
-		| (cond=CONDITIONAL) DOT (bitWidth=BIT_WIDTH) (source=REGISTER) COMMA LSQUARE (addrReg=REGISTER) PLUS_SIGN (offset=HEX_NUMBER) RSQUARE
-		| (cond=CONDITIONAL) DOT (bitWidth=BIT_WIDTH) (source=REGISTER) COMMA LSQUARE (addrReg=REGISTER) PLUS_SIGN (offsetReg=REGISTER) RSQUARE
-		| (cond=CONDITIONAL) DOT (bitWidth=BIT_WIDTH) (source=REGISTER) COMMA (value=HEX_NUMBER)
-		| (cond=CONDITIONAL) DOT (bitWidth=BIT_WIDTH) (source=REGISTER) COMMA (otherReg=REGISTER);
+/* mov.d reg, [HEAP + num] */
+/* mov.d reg, [reg + num] */
+opCode5: MOVE DOT (bitWidth=BIT_WIDTH) (register=regRef) COMMA LSQUARE (memType=MEM_TYPE) PLUS_SIGN (offset=numRef) RSQUARE
+       |  MOVE DOT (bitWidth=BIT_WIDTH) (register=regRef) COMMA LSQUARE (baseRegister=regRef) PLUS_SIGN (offset=numRef) RSQUARE;
+
+/* mov.d [reg], number */
+/* mov.d [reg + reg], number */
+//opCode6: MOVE DOT (bitWidth=BIT_WIDTH) LSQUARE (register=regRef)(PLUS_SIGN(offsetReg=regRef))? RSQUARE COMMA (value=numRef) (increment=INCREMENT)?;
+
+opCode7: (func=LEGACY_ARITHMETIC) DOT (bitWidth=BIT_WIDTH) (register=regRef) COMMA (value=numRef);
+opCode8: KEYCHECK (key=KEY);
+
+opCode9: (func=ARITHMETIC) DOT (bitWidth=BIT_WIDTH) (dest=regRef) COMMA (leftReg=regRef) COMMA (right=anyRef);
+
+/* rule for Opcode 0/6/A */
+movInstr: MOVE DOT (bitWidth=BIT_WIDTH) LSQUARE (memType=MEM_TYPE|base=regRef) (PLUS_SIGN (offset=anyRef))? RSQUARE COMMA (source=anyRef) (increment=INCREMENT)?
+        | MOVE DOT (bitWidth=BIT_WIDTH) LSQUARE (memType=MEM_TYPE|base=regRef) (PLUS_SIGN (offset=anyRef) PLUS_SIGN (immediate=anyRef))? RSQUARE COMMA (source=anyRef) (increment=INCREMENT)?;
+
+/* can be
+mov.d [reg], reg
+mov.d [reg + reg], reg
+mov.d [reg + num], reg
+mov.d [HEAP + reg], reg
+mov.d [HEAP + num], reg
+mov.d [HEAP + reg + num], reg
+
+*/
+/*opCodeA:           MOVE DOT (bitWidth=BIT_WIDTH) LSQUARE (baseReg=regRef) RSQUARE COMMA (sourceReg=regRef) (increment=INCREMENT)?
+       | MOVE DOT (bitWidth=BIT_WIDTH) LSQUARE (baseReg=regRef) PLUS_SIGN (offset=anyRef) RSQUARE COMMA (sourceReg=regRef) (increment=INCREMENT)?
+	   | MOVE DOT (bitWidth=BIT_WIDTH) LSQUARE (memType=MEM_TYPE) PLUS_SIGN (offset=anyRef) RSQUARE COMMA (sourceReg=regRef) (increment=INCREMENT)?
+	   | MOVE DOT (bitWidth=BIT_WIDTH) LSQUARE (memType=MEM_TYPE) PLUS_SIGN (baseReg=regRef) PLUS_SIGN (value=numRef) RSQUARE COMMA (sourceReg=regRef) (increment=INCREMENT)?;*/
+
+
+opCodeC0: (cond=CONDITIONAL) DOT (bitWidth=BIT_WIDTH) (source=regRef) COMMA LSQUARE (memType=MEM_TYPE) PLUS_SIGN (offset=anyRef) RSQUARE
+
+		| (cond=CONDITIONAL) DOT (bitWidth=BIT_WIDTH) (source=regRef) COMMA LSQUARE (addrReg=regRef) PLUS_SIGN (offset=anyRef) RSQUARE
+
+		| (cond=CONDITIONAL) DOT (bitWidth=BIT_WIDTH) (source=regRef) COMMA (value=anyRef);
+
+opCodeC1: (func=SAVEREG) (reg=regRef) COMMA (index=numRef)
+        | (func=LOADREG) (index=numRef) COMMA (reg=regRef);
+
+
+opCodeC2: (func=SAVE|func=LOAD) regRef (COMMA regRef)+
+        | (func=SAVEALL|func=LOADALL);
+
+numberLiteral : IntegerLiteral | DecimalLiteral | HEX_NUMBER;
+regRef: (reg=REGISTER) | (var=VARIABLE_NAME);
+
+numRef: (num=HEX_NUMBER) | (var=VARIABLE_NAME);
+
+anyRef: (reg=REGISTER) | (num=HEX_NUMBER) | (var=VARIABLE_NAME);
+
+variableDecl:  (name=VARIABLE_NAME) COLON (type=VARIABLE_TYPE) (const=CONST)? (val=numberLiteral);
 
 // Lexer Rules
 MOVE: M O V;
@@ -50,6 +95,12 @@ END_LOOP: E N D L O O P;
 KEYCHECK: K E Y C H E C K;
 END_COND: E N D C O N D;
 INCREMENT: I N C;
+SAVE: S A V E ;
+SAVEREG: S A V E R E G;
+SAVEALL: S A V E A L L;
+LOAD: L O A D;
+LOADREG: L O A D R E G;
+LOADALL: L O A D A L L;
 LSQUARE: '[';
 RSQUARE: ']';
 LCURL: '{';
@@ -78,8 +129,8 @@ EQ: E Q;
 NE: N E;
 
 // arithmetic
-
-ARITHMETIC: ADD | SUB | MUL | LSH | RSH | AND | OR | NOT | XOR | NONE;
+LEGACY_ARITHMETIC: ADD | SUB | MUL | LSH | RSH ;
+ARITHMETIC: AND | OR | NOT | XOR | NONE;
 
 ADD: A D D;
 SUB: S U B;
@@ -124,11 +175,26 @@ RSD_KEY: R S D;
 SL_KEY: S L;
 SR_KEY: S R;
 
+CONST: C O N S T;
+
+MASTER: M A S T E R;
+
 REGISTER: [Rr][0-9a-fA-F];
 HEX_NUMBER: '0' X [0-9a-fA-F]+;
 WS: [ \t\r\n]+ -> skip;
 COMMENT: '#'.* -> skip;
 DOT: '.';
+COLON: ':';
+VARIABLE_NAME: [A-Za-z][A-Za-z0-9]*;
+DecimalLiteral  : IntegerLiteral '.' [0-9]+ ;
+IntegerLiteral  : '0' | '1'..'9' '0'..'9'* ;
+
+VARIABLE_TYPE: DOT ((U | S) ('8' | '16' | '32' | '64') | F ('32' | '64'));
+
+ID:  '{'[0-9A-Fa-f]+ '}' ;
+
+CHEAT_NAME: '"' [0-9A-Za-z \\.()_]+ '"';
+
 fragment A : [aA]; // match either an 'a' or 'A'
 fragment B : [bB];
 fragment C : [cC];

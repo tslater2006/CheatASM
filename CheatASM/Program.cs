@@ -47,7 +47,7 @@ namespace CheatASM
                             }
                             else
                             {
-                                Console.WriteLine(asm.AssembleLine(l));
+                                Console.WriteLine(asm.AssembleString(l));
                             }
                         }
                     }
@@ -87,6 +87,9 @@ namespace CheatASM
             optSet.Add("v|verbose", "Verbose Logging.", option => verbose = option != null);
             optSet.Add("repl", "REPL mode", option => repl = option != null);
             optSet.Parse(args);
+
+            Assembler asm = new Assembler();
+            var x = asm.AssembleFile(@"C:\Users\tslat\source\repos\CheatASM\CheatASM\examples\variables.asm");
 
             if (repl)
             {
@@ -143,7 +146,7 @@ namespace CheatASM
 
             /* at this point we know the inputPath exists, and if its a folder or not */
 
-            Assembler asm = new Assembler();
+            asm = new Assembler();
             Disassembler disasm = new Disassembler();
 
             if (isInputDir)
@@ -163,7 +166,7 @@ namespace CheatASM
                     }
                     if (assemble)
                     {
-                        File.WriteAllText(outputPath + relativePath, asm.AssembleFile(file));
+                        File.WriteAllText(outputPath + relativePath, asm.AssembleFile(file).ToString());
                     } else
                     {
                         File.WriteAllText(outputPath + relativePath, disasm.DisassembleFile(file));
@@ -180,18 +183,18 @@ namespace CheatASM
                     {
                         if (textMode)
                         {
-                            File.WriteAllText(outputPath, asm.AssembleLine(text));
+                            File.WriteAllText(outputPath, asm.AssembleString(text).ToString());
                         }
                         else
                         {
-                            File.WriteAllText(outputPath, asm.AssembleFile(inputPath));
+                            File.WriteAllText(outputPath, asm.AssembleFile(inputPath).ToString());
                         }
                     }
                     else
                     {
                         if (textMode)
                         {
-                            Console.Write(asm.AssembleLine(text));
+                            Console.Write(asm.AssembleString(text));
                         }
                         else
                         {

@@ -104,10 +104,39 @@ namespace CheatASM
                         switch(line[1])
                         {
                             case '0':
-                                /* Compare register */
                                 op = new RegisterConditionalOpcode(blocks);
                                 WriteOpcode(op, sb);
                                 conditionalIndent++;
+                                break;
+                            case '1':
+                                op = new SaveRestoreRegisterOpcode(blocks);
+                                WriteOpcode(op, sb);
+                                break;
+                            case '2':
+                                op = new SaveRestoreClearMaskOpcode(blocks);
+                                WriteOpcode(op, sb);
+                                break;
+                            case '3':
+                                op = new SaveLoadStaticRegisterOpcode(blocks);
+                                WriteOpcode(op, sb);
+                                break;
+                        }
+                        break;
+                    case 'F':
+                        switch(line[1])
+                        {
+                            case 'F':
+                                switch(line[2])
+                                {
+                                    case '0':
+                                        op = new PauseOpcode(blocks);
+                                        WriteOpcode(op, sb);
+                                        break;
+                                    case '1':
+                                        op = new ResumeOpcode(blocks);
+                                        WriteOpcode(op, sb);
+                                        break;
+                                }
                                 break;
                         }
                         break;

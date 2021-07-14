@@ -2,6 +2,7 @@
 using Antlr4.Runtime.Misc;
 using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Globalization;
 using System.IO;
 using System.Linq;
@@ -547,12 +548,124 @@ namespace CheatASM
 
         }
 
-        private void AssembleOpCodeC1(OpCodeC1Context opCtx, Cheat cheat)
+        private void AssembleOpCodeC1C2(OpCodeC1C2Context opCtx, Cheat cheat)
         {
+            string func = opCtx.func.Text.ToLower();
+            string type = opCtx.type.Text.ToLower();
 
+            if (opCtx.index != null || opCtx.reg != null)
+            {
+                SaveRestoreRegisterOpcode op = new SaveRestoreRegisterOpcode();
+                switch (func)
+                {
+                    case "load":
+                        op.OperandType = 0;
+                        break;
+                    case "save":
+                        op.OperandType = 1;
+                        break;
+                    case "clear":
+                        if (type.Equals("saved"))
+                        {
+                            op.OperandType = 2;
+                        }
+                        else if (type.Equals("reg"))
+                        {
+                            op.OperandType = 3;
+                        }
+                        break;
+                }
+                /* Op Code C1 */
+                switch (op.OperandType) {
+                    case 0:
+                        /* Restore */
+                        op.SourceIndex = Convert.ToUInt32(ParseNumRef(opCtx.index), 16);
+                        op.DestinationIndex = Convert.ToUInt32(ParseRegRef(opCtx.reg, cheat).Substring(1), 16);
+                        break;
+                    case 1:
+                        /* Save */
+                        op.DestinationIndex = Convert.ToUInt32(ParseNumRef(opCtx.index), 16);
+                        op.SourceIndex = Convert.ToUInt32(ParseRegRef(opCtx.reg, cheat).Substring(1), 16);
+                        break;
+                    case 2:
+                        /* Clear saved */
+                        op.DestinationIndex = Convert.ToUInt32(ParseNumRef(opCtx.index), 16);
+                        break;
+                    case 3:
+                        /* clear register */
+                        op.DestinationIndex = Convert.ToUInt32(ParseRegRef(opCtx.reg, cheat).Substring(1), 16);
+                        break;
+                }
+                cheat.Opcodes.Add(op);
+            } else if (opCtx.regs != null || opCtx.indexes != null)
+            {
+                /* Op Code C2 */
+                SaveRestoreClearMaskOpcode op = new();
+                switch (func)
+                {
+                    case "load":
+                        op.OperandType = 0;
+                        break;
+                    case "save":
+                        op.OperandType = 1;
+                        break;
+                    case "clear":
+                        if (type.Equals("saved"))
+                        {
+                            op.OperandType = 2;
+                        }
+                        else if (type.Equals("regs"))
+                        {
+                            op.OperandType = 3;
+                        }
+                        break;
+                }
+
+                bool[] maskBits = new bool[16];
+
+                if (opCtx.indexes != null)
+                {
+                    foreach (var numRefCtx in opCtx.indexes.GetRuleContexts<NumRefContext>())
+                    {
+                        var indexNum = Convert.ToUInt32(ParseNumRef(numRefCtx), 16);
+                        maskBits[indexNum] = true;
+                    }
+                } else if (opCtx.regs != null)
+                {
+                    foreach(var regRefCtx in opCtx.regs.GetRuleContexts<RegRefContext>())
+                    {
+                        var regNum = Convert.ToUInt32(ParseRegRef(regRefCtx, cheat).Substring(1), 16);
+                        maskBits[regNum] = true;
+                    }
+                }
+
+                Array.Copy(maskBits, op.RegMask, 16);
+                cheat.Opcodes.Add(op);
+            }
         }
 
-        private void AssembleOpCodeC2(OpCodeC2Context opCtx, Cheat cheat)
+        private void AssembleOpCodeC3(OpCodeC3Context opCtx, Cheat cheat)
+        {
+            SaveLoadStaticRegisterOpcode op = new();
+            op.WriteMode = opCtx.func.Text.ToLower().Equals("save");
+
+            op.StaticRegIndex = Convert.ToUInt32(opCtx.sreg.Text.Substring(2), 16);
+            op.RegIndex = Convert.ToUInt32(ParseRegRef(opCtx.reg, cheat).Substring(1));
+
+            cheat.Opcodes.Add(op);
+        }
+
+        private void AssembleOpCodeFF0(OpCodeFF0Context opCtx, Cheat cheat)
+        {
+            cheat.Opcodes.Add(new PauseOpcode());
+        }
+
+        private void AssembleOpCodeFF1(OpCodeFF1Context opCtx, Cheat cheat)
+        {
+            cheat.Opcodes.Add(new ResumeOpcode());
+        }
+
+        private void AssembleOpCodeFFF(OpCodeFFFContext opCtx, Cheat cheat)
         {
 
         }
@@ -769,11 +882,20 @@ namespace CheatASM
                 case OpCodeC0Context op:
                     AssembleOpCodeC0(op, cheat);
                     break;
-                case OpCodeC1Context op:
-                    AssembleOpCodeC1(op, cheat);
+                case OpCodeC1C2Context op:
+                    AssembleOpCodeC1C2(op, cheat);
                     break;
-                case OpCodeC2Context op:
-                    AssembleOpCodeC2(op, cheat);
+                case OpCodeC3Context op:
+                    AssembleOpCodeC3(op, cheat);
+                    break;
+                case OpCodeFF0Context op:
+                    AssembleOpCodeFF0(op, cheat);
+                    break;
+                case OpCodeFF1Context op:
+                    AssembleOpCodeFF1(op, cheat);
+                    break;
+                case OpCodeFFFContext op:
+                    AssembleOpCodeFFF(op, cheat);
                     break;
             }
         }

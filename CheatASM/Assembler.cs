@@ -979,6 +979,30 @@ namespace CheatASM
 
             cheat.Opcodes.Add(opTyped);
         }
+        private static void CheckValueFitsBitWidth(BitWidthType width, ulong value)
+        {
+            bool valueFits = true;
+            ulong valueMax = 0;
+            switch (width)
+            {
+                case BitWidthType.b:
+                    valueMax = byte.MaxValue;
+                    break;
+                case BitWidthType.w:
+                    valueMax = ushort.MaxValue;
+                    break;
+                case BitWidthType.d:
+                    valueMax = uint.MaxValue;
+                    break;
+                case BitWidthType.q:
+                    valueMax = ulong.MaxValue;
+                    break;
+            }
+            if (value > valueMax)
+            {
+                throw new AssemblerException($"Instruction has bit width: '{width}' but value 0x{value:X} exceeds the maximum of 0x{valueMax:X}");
+            }
+        }
 
         public void AssembleStatement(StatementContext stmt,Cheat cheat)
         {

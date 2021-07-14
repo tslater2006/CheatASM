@@ -28,7 +28,7 @@ namespace CheatASM
             {
                 case 0:
                     MemType = (MemoryAccessType)GetNibble(blocks[0], 7);
-                    RelativeAddress = (((blocks[0] & 0xF) << 32) + blocks[1]);
+                    RelativeAddress = (((ulong)(blocks[0] & 0xF) << 32) + blocks[1]);
                     break;
                 case 1:
                     MemType = (MemoryAccessType)GetNibble(blocks[0], 7);
@@ -36,7 +36,7 @@ namespace CheatASM
                     break;
                 case 2:
                     AddressRegister = GetNibble(blocks[0], 7);
-                    RelativeAddress = (((blocks[0] & 0xF) << 32) + blocks[1]);
+                    RelativeAddress = (((ulong)(blocks[0] & 0xF) << 32) + blocks[1]);
                     break;
                 case 3:
                     AddressRegister = GetNibble(blocks[0], 7);

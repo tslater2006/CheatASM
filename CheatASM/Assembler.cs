@@ -976,7 +976,7 @@ namespace CheatASM
             }
 
             opTyped.Value = Convert.ToUInt64(ParseNumRef(opCtx.value), 16);
-
+            CheckValueFitsBitWidth(opTyped.BitWidth, opTyped.Value);
             cheat.Opcodes.Add(opTyped);
         }
         private static void CheckValueFitsBitWidth(BitWidthType width, ulong value)
@@ -998,6 +998,7 @@ namespace CheatASM
                     valueMax = ulong.MaxValue;
                     break;
             }
+
             if (value > valueMax)
             {
                 throw new AssemblerException($"Instruction has bit width: '{width}' but value 0x{value:X} exceeds the maximum of 0x{valueMax:X}");

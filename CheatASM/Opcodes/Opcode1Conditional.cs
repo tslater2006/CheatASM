@@ -67,7 +67,7 @@ namespace CheatASM
             SetNibble(ref blocks[0], 5, 0);
             SetNibble(ref blocks[0], 6, 0);
             SetNibble(ref blocks[0], 7, (uint)((Immediate >> 36) & 0xF));
-            SetNibble(ref blocks[0], 7, (uint)((Immediate >> 32) & 0xF));
+            SetNibble(ref blocks[0], 8, (uint)((Immediate >> 32) & 0xF));
             blocks[1] = (uint)(Immediate & 0xFFFFFFFF);
             if (BitWidth == BitWidthType.q)
             {

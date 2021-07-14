@@ -732,7 +732,48 @@ namespace CheatASM
 
         private void AssembleOpCodeFFF(OpCodeFFFContext opCtx, Cheat cheat)
         {
+            OpcodeFFFDebugLog op = new();
+            op.BitWidth = Enum.Parse<BitWidthType>(opCtx.bitWidth.Text, true);
+            op.LogId = Convert.ToUInt32(opCtx.id.Text, 16);
 
+            if (opCtx.memType != null)
+            {
+                op.MemType = Enum.Parse<MemoryAccessType>(opCtx.memType.Text);
+                if (opCtx.offset != null)
+                {
+                    var refType = GetAnyRefType(opCtx.offset);
+                    switch(refType)
+                    {
+                        case AnyRefType.NUMBER:
+                            op.OperandType = 0;
+                            op.RelativeAddress = Convert.ToUInt64(ParseAnyRef(opCtx.offset, AnyRefType.NUMBER, cheat), 16);
+                            break;
+                        case AnyRefType.REGISTER:
+                            op.OperandType = 1;
+                            op.OffsetRegister = Convert.ToUInt32(ParseAnyRef(opCtx.offset, AnyRefType.REGISTER, cheat).Substring(1), 16);
+                            break;
+                    }
+                }
+            } else if (opCtx.addrReg != null)
+            {
+                var refType = GetAnyRefType(opCtx.offset);
+                switch (refType)
+                {
+                    case AnyRefType.NUMBER:
+                        op.OperandType = 2;
+                        op.RelativeAddress = Convert.ToUInt64(ParseAnyRef(opCtx.offset, AnyRefType.NUMBER, cheat), 16);
+                        break;
+                    case AnyRefType.REGISTER:
+                        op.OperandType = 3;
+                        op.OffsetRegister = Convert.ToUInt32(ParseAnyRef(opCtx.offset, AnyRefType.REGISTER, cheat).Substring(1), 16);
+                        break;
+                }
+            } else
+            {
+                op.OperandType = 4;
+                op.ValueRegister = Convert.ToUInt32(ParseRegRef(opCtx.value, cheat).Substring(1), 16);
+            }
+            cheat.Opcodes.Add(op);
         }
 
         private void AssembleOpCodeC0(OpCodeC0Context opCtx, Cheat cheat)

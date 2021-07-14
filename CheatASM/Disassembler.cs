@@ -136,6 +136,10 @@ namespace CheatASM
                                         op = new OpcodeFF1ResumeProcess(blocks);
                                         WriteOpcode(op, sb);
                                         break;
+                                    case 'F':
+                                        op = new OpcodeFFFDebugLog(blocks);
+                                        WriteOpcode(op, sb);
+                                        break;
                                 }
                                 break;
                         }

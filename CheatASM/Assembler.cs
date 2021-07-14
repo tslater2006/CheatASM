@@ -242,14 +242,15 @@ namespace CheatASM
             return result;
         }
 
-        public AssemblyResult AssembleInstructions(string[] instructions)
-        {
-            return AssembleString(String.Join(Environment.NewLine, instructions));
-        }
-
         public AssemblyResult AssembleInstruction(string instr)
         {
             return AssembleString(instr);
+        }
+
+        public string AssembleSingleInstruction(string instr)
+        {
+            var result = AssembleString(instr);
+            return result.Cheats[0].Opcodes[0].ToByteString();
         }
 
         private string ParseAnyRef(AnyRefContext anyRef, AnyRefType targetType, Cheat cheat)
@@ -372,7 +373,7 @@ namespace CheatASM
                 else
                 {
                     // TODO: Support line numbers for errors 
-                    throw new AssemblerException("Variable: " + variableName + " not defined before line XYZ");
+                    throw new AssemblerException("Variable: " + variableName + " not defined.");
                 }
             }
         }

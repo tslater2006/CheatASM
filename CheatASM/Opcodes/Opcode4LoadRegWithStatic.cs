@@ -6,14 +6,14 @@
 
 namespace CheatASM
 {
-    public class LoadRegisterStaticOpcode : CheatOpcode
+    public class Opcode4LoadRegWithStatic : CheatOpcode
     {
         public uint RegisterIndex;
         public UInt64 Value;
 
-        public LoadRegisterStaticOpcode() { }
+        public Opcode4LoadRegWithStatic() { }
 
-        public LoadRegisterStaticOpcode(uint[] blocks)
+        public Opcode4LoadRegWithStatic(uint[] blocks)
         {
             RegisterIndex = GetNibble(blocks[0], 4);
             Value = ((UInt64)blocks[1] << 32) + blocks[2];

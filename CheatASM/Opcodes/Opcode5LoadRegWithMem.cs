@@ -7,7 +7,7 @@ using System.Text;
 
 namespace CheatASM
 {
-    public class LoadRegisterMemoryOpcode : CheatOpcode
+    public class Opcode5LoadRegWithMem : CheatOpcode
     {
         public BitWidthType BitWidth;
         public MemoryAccessType MemType;
@@ -15,9 +15,9 @@ namespace CheatASM
         public bool UseReg;
         public UInt64 Immediate;
 
-        public LoadRegisterMemoryOpcode() { }
+        public Opcode5LoadRegWithMem() { }
 
-        public LoadRegisterMemoryOpcode(uint[] blocks)
+        public Opcode5LoadRegWithMem(uint[] blocks)
         {
             BitWidth = (BitWidthType)GetNibble(blocks[0], 2);
             MemType = (MemoryAccessType)GetNibble(blocks[0], 3);

@@ -7,7 +7,7 @@ using System.Text;
 
 namespace CheatASM
 {
-    public class RegisterConditionalOpcode : CheatOpcode
+    public class OpcodeC0RegisterConditional : CheatOpcode
     {
         public BitWidthType BitWidth;
         public ConditionalComparisonType Condition;
@@ -20,9 +20,9 @@ namespace CheatASM
         public uint OtherRegister;
         public ulong Value;
 
-        public RegisterConditionalOpcode() { }
+        public OpcodeC0RegisterConditional() { }
 
-        public RegisterConditionalOpcode(uint[] blocks)
+        public OpcodeC0RegisterConditional(uint[] blocks)
         {
             /* C0TcSX## */
             /* C0TcS0Ma aaaaaaaa */

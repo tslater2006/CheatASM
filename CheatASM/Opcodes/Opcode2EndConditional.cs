@@ -4,11 +4,11 @@
 
 namespace CheatASM
 {
-    public class EndConditionalOpcode : CheatOpcode
+    public class Opcode2EndConditional : CheatOpcode
     {
-        public EndConditionalOpcode() { }
+        public Opcode2EndConditional() { }
 
-        public EndConditionalOpcode(uint[] blocks) { }
+        public Opcode2EndConditional(uint[] blocks) { }
 
         public override string ToASM()
         {

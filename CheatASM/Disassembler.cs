@@ -31,16 +31,16 @@ namespace CheatASM
                 switch (line[0])
                 {
                     case '0':
-                        op = new StoreStaticOpcode(blocks);
+                        op = new Opcode0StoreStaticToMemory(blocks);
                         WriteOpcode(op, sb);
                         break;
                     case '1':
-                        op = new ConditionalOpcode(blocks);
+                        op = new Opcode1Conditional(blocks);
                         WriteOpcode(op, sb);
                         conditionalIndent++;
                         break;
                     case '2':
-                        op = new EndConditionalOpcode(blocks);
+                        op = new Opcode2EndConditional(blocks);
                         if (conditionalIndent > 0)
                         {
                             conditionalIndent--;
@@ -48,8 +48,8 @@ namespace CheatASM
                         WriteOpcode(op, sb);
                         break;
                     case '3':
-                        op = new LoopOpcode(blocks);
-                        if (((LoopOpcode)op).IsEnd)
+                        op = new Opcode3Loop(blocks);
+                        if (((Opcode3Loop)op).IsEnd)
                         {
                             if (conditionalIndent > 0)
                             {
@@ -57,40 +57,40 @@ namespace CheatASM
                             }
                         }
                         WriteOpcode(op, sb);
-                        if (((LoopOpcode)op).IsEnd == false)
+                        if (((Opcode3Loop)op).IsEnd == false)
                         {
                             conditionalIndent++;
                         }
                         break;
                     case '4':
-                        op = new LoadRegisterStaticOpcode(blocks);
+                        op = new Opcode4LoadRegWithStatic(blocks);
                         WriteOpcode(op, sb);
                         break;
                     case '5':
                         /*mov(b/w/d/q) R0 [HEAP+IMM]*/
-                        op = new LoadRegisterMemoryOpcode(blocks);
+                        op = new Opcode5LoadRegWithMem(blocks);
                         WriteOpcode(op, sb);
                         break;
                     case '6':
-                        op = new StoreStaticToAddressOpcode(blocks);
+                        op = new Opcode6StoreStaticToAddress(blocks);
                         WriteOpcode(op, sb);
                         break;
                     case '7':
-                        op = new LegacyArithmeticOpcode(blocks);
+                        op = new Opcode7LegacyArithmetic(blocks);
                         WriteOpcode(op, sb);
                         break;
                     case '8':
-                        op = new KeypressConditionalOpcode(blocks);
+                        op = new Opcode8KeypressConditional(blocks);
                         WriteOpcode(op, sb);
                         conditionalIndent++;
                         break;
                     case '9':
-                        op = new ArithmeticOpcode(blocks);
+                        op = new Opcode9Arithmetic(blocks);
                         WriteOpcode(op, sb);
                         break;
                     case 'a':
                     case 'A':
-                        op = new StoreRegisterToAddressOpcode(blocks);
+                        op = new OpcodeAStoreRegToAddress(blocks);
                         WriteOpcode(op, sb);
                         break;
                     default:
@@ -104,20 +104,20 @@ namespace CheatASM
                         switch(line[1])
                         {
                             case '0':
-                                op = new RegisterConditionalOpcode(blocks);
+                                op = new OpcodeC0RegisterConditional(blocks);
                                 WriteOpcode(op, sb);
                                 conditionalIndent++;
                                 break;
                             case '1':
-                                op = new SaveRestoreRegisterOpcode(blocks);
+                                op = new OpcodeC1SaveRestoreReg(blocks);
                                 WriteOpcode(op, sb);
                                 break;
                             case '2':
-                                op = new SaveRestoreClearMaskOpcode(blocks);
+                                op = new OpcodeC2SaveRestoreRegMask(blocks);
                                 WriteOpcode(op, sb);
                                 break;
                             case '3':
-                                op = new SaveLoadStaticRegisterOpcode(blocks);
+                                op = new OpcodeC3ReadWriteStaticReg(blocks);
                                 WriteOpcode(op, sb);
                                 break;
                         }
@@ -129,11 +129,11 @@ namespace CheatASM
                                 switch(line[2])
                                 {
                                     case '0':
-                                        op = new PauseOpcode(blocks);
+                                        op = new OpcodeFF0PauseProcess(blocks);
                                         WriteOpcode(op, sb);
                                         break;
                                     case '1':
-                                        op = new ResumeOpcode(blocks);
+                                        op = new OpcodeFF1ResumeProcess(blocks);
                                         WriteOpcode(op, sb);
                                         break;
                                 }

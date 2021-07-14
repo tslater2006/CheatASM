@@ -90,7 +90,7 @@ namespace CheatASM
     public class Assembler : BaseErrorListener
     {
         static string[] RegisterList = { "R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8", "R9", "RA", "RB", "RC", "RD", "RE", "RF" };
-        public List<VariableDeclaration> Variables = new List<VariableDeclaration>();
+        public Dictionary<string,VariableDeclaration> Variables = new Dictionary<string,VariableDeclaration>();
         HashSet<String> SeenRegisters = new HashSet<string>();
 
         string errorMsg;
@@ -109,10 +109,63 @@ namespace CheatASM
 
         }
 
-        public AssemblyResult AssembleString(string contents)
+        private string PreProcessConstants(string contents)
         {
+
             AntlrInputStream stream = new AntlrInputStream(contents);
             CheatASMLexer lexer = new CheatASMLexer(stream);
+
+            CheatASMParser parser = new CheatASMParser(new CommonTokenStream(lexer));
+            parser.ErrorHandler = new DefaultErrorStrategy();
+            parser.TrimParseTree = true;
+            parser.BuildParseTree = true;
+            parser.AddErrorListener(this);
+            errorMsg = null;
+            errorPos = 0;
+            
+            ProgramContext prog = parser.program();
+            Dictionary<string, string> constantValues = new();
+            int lastConstantStopIndex = 0;
+            foreach (var decl in prog.variableDecl())
+            { 
+                if (decl.@const != null)
+                {
+                    /* its a constant! */
+                    constantValues.Add(decl.name.Text, decl.val.start.Text);
+                    lastConstantStopIndex = decl.Stop.StopIndex;
+                }
+            }
+            /* parse all of the tokens again */
+
+            stream = new AntlrInputStream(contents);
+            lexer = new CheatASMLexer(stream);
+
+            var tokenStream = new CommonTokenStream(lexer);
+            tokenStream.Fill();
+
+            var variableTokens = tokenStream.GetTokens().Where(t => t.Type == CheatASMLexer.VARIABLE_NAME && t.StartIndex > lastConstantStopIndex).OrderByDescending(t => t.StartIndex).ToList();
+            StringBuilder sb = new StringBuilder(contents);
+            foreach(var variableName in variableTokens)
+            {
+                if (constantValues.ContainsKey(variableName.Text))
+                {
+                    sb.Remove(variableName.StartIndex, variableName.Text.Length);
+                    sb.Insert(variableName.StartIndex, constantValues[variableName.Text]);
+                }
+            }
+
+            contents = sb.ToString();
+            return contents;
+        }
+
+        public AssemblyResult AssembleString(string contents)
+        {
+
+            contents = PreProcessConstants(contents);
+
+            AntlrInputStream stream = new AntlrInputStream(contents);
+            CheatASMLexer lexer = new CheatASMLexer(stream);
+
             CheatASMParser parser = new CheatASMParser(new CommonTokenStream(lexer));
             parser.ErrorHandler = new DefaultErrorStrategy();
             parser.TrimParseTree = true;
@@ -217,6 +270,45 @@ namespace CheatASM
             throw new AssemblerException("Failed to parse Any Ref");
         }
 
+        private AnyRefType GetRefType(RegRefContext regRef, Cheat cheat)
+        {
+            if (Variables.ContainsKey(regRef.reg.Text))
+            {
+                var definedVar = Variables[regRef.reg.Text];
+                if (definedVar.Const)
+                {
+                    return AnyRefType.NUMBER;
+                } else
+                {
+                    return AnyRefType.REGISTER;
+                }
+            }
+            else
+            {
+                return AnyRefType.REGISTER;
+            }
+        }
+
+        private AnyRefType GetRefType(NumRefContext numRef, Cheat cheat)
+        {
+            if (Variables.ContainsKey(numRef.num.Text))
+            {
+                var definedVar = Variables[numRef.num.Text];
+                if (definedVar.Const)
+                {
+                    return AnyRefType.NUMBER;
+                }
+                else
+                {
+                    return AnyRefType.REGISTER;
+                }
+            }
+            else
+            {
+                return AnyRefType.NUMBER;
+            }
+        }
+
         private string ParseRegRef(RegRefContext regRef, Cheat cheat)
         {
             if (regRef.reg != null)
@@ -230,7 +322,11 @@ namespace CheatASM
             else
             {
                 var variableName = regRef.var.Text;
-                var variable = Variables.Find(v => v.Name == variableName);
+                VariableDeclaration variable = null;
+                if (Variables.ContainsKey(variableName))
+                {
+                    variable = Variables[variableName];
+                }
                 if (variable != null)
                 {
                     if (variable.Const == true)
@@ -261,7 +357,7 @@ namespace CheatASM
                                 cheat.VariableReg.Add(variable, availableReg);
 
                                 /* create the variable init opcode */
-                                var loadReg = new LoadRegisterStaticOpcode();
+                                var loadReg = new Opcode4LoadRegWithStatic();
                                 loadReg.RegisterIndex = Convert.ToUInt32(availableReg.Substring(1), 16);
                                 loadReg.Value = Convert.ToUInt64(ConvertVariableValue(variable),16);
 
@@ -358,7 +454,11 @@ namespace CheatASM
             else
             {
                 var variableName = numRef.var.Text;
-                var variable = Variables.Find(v => v.Name == variableName);
+                VariableDeclaration variable = null;
+                if (Variables.ContainsKey(variableName))
+                {
+                    variable = Variables[variableName];
+                }
                 if (variable != null)
                 {
                     /* found a variable */
@@ -391,7 +491,11 @@ namespace CheatASM
             } else if (ctx.var != null)
             {
                 /* we have a variable... */
-                var variable = Variables.Find(v => v.Name == ctx.var.Text);
+                VariableDeclaration variable = null;
+                if (Variables.ContainsKey(ctx.var.Text))
+                {
+                    variable = Variables[ctx.var.Text];
+                }
                 if (variable == null)
                 {
                     throw new AssemblerException("Use of undefined variable: " + ctx.var.Text);
@@ -419,134 +523,95 @@ namespace CheatASM
                 decl.Const = (varCtx.@const != null);
                 decl.Value = varCtx.val.GetText();
 
-                if (Variables.Find(v => v.Name == decl.Name) != null)
+                if (Variables.ContainsKey(decl.Name))
                 {
                     throw new AssemblerException("Variable '" + decl.Name + "' already defined.");
                 }
 
-                Variables.Add(decl);
+                Variables.Add(decl.Name, decl);
         }
 
-
-        private void AssembleMovInstr(MovInstrContext opCtx, Cheat cheat)
+        private void AssembleOpCode6(OpCode6Context opCtx, Cheat cheat)
         {
-            /* deterimine if this should be opcode 0... */
+            /* should be an opcode 6... */
+            Opcode6StoreStaticToAddress opTyped = new Opcode6StoreStaticToAddress();
 
-            /* mov.d [HEAP + reg + num], num */
-            if (opCtx.memType != null && GetAnyRefType(opCtx.source) == AnyRefType.NUMBER)
+            opTyped.BitWidth = Enum.Parse<BitWidthType>(opCtx.bitWidth.Text, true);
+            opTyped.RegisterIndex = Convert.ToUInt16(ParseRegRef(opCtx.@base, cheat).Substring(1), 16);
+
+            if (opCtx.increment != null)
             {
-                /* should be an opcode 0... */
-                StoreStaticOpcode opTyped = new StoreStaticOpcode();
-
-                opTyped.BitWidth = Enum.Parse<BitWidthType>(opCtx.bitWidth.Text, true);
-                opTyped.MemType = Enum.Parse<MemoryAccessType>(opCtx.memType.Text, true);
-                opTyped.OffsetRegister = Convert.ToUInt16(ParseAnyRef(opCtx.offset, AnyRefType.REGISTER, cheat).Substring(1), 16);
-                opTyped.RelativeAddress = Convert.ToUInt64(ParseAnyRef(opCtx.immediate, AnyRefType.NUMBER, cheat), 16);
-                opTyped.Value = Convert.ToUInt64(ParseAnyRef(opCtx.source, AnyRefType.NUMBER, cheat), 16);
-
-                cheat.Opcodes.Add(opTyped);
-                return;
+                opTyped.IncrementFlag = true;
+            }
+            if (opCtx.regOffset != null)
+            {
+                opTyped.OffsetEnableFlag = true;
+                opTyped.OffsetRegister = Convert.ToUInt16(ParseRegRef(opCtx.regOffset, cheat).Substring(1), 16);
             }
 
-            /* mov.d [reg], number */
-            /* mov.d [reg + reg], number */
-            if (opCtx.@base != null && GetAnyRefType(opCtx.source) == AnyRefType.NUMBER)
-            {
-                /* should be an opcode 6... */
-                StoreStaticToAddressOpcode opTyped = new StoreStaticToAddressOpcode();
-
-                opTyped.BitWidth = Enum.Parse<BitWidthType>(opCtx.bitWidth.Text, true);
-                opTyped.RegisterIndex = Convert.ToUInt16(ParseRegRef(opCtx.@base, cheat).Substring(1), 16);
-
-                if (opCtx.increment != null)
-                {
-                    opTyped.IncrementFlag = true;
-                }
-                if (opCtx.offset != null)
-                {
-                    opTyped.OffsetEnableFlag = true;
-                    opTyped.OffsetRegister = Convert.ToUInt16(ParseAnyRef(opCtx.offset, AnyRefType.REGISTER, cheat).Substring(1), 16);
-                }
-
-                opTyped.Value = Convert.ToUInt64(ParseAnyRef(opCtx.source, AnyRefType.NUMBER, cheat), 16);
-                cheat.Opcodes.Add(opTyped);
-                return;
-            }
-
-            /* else it should be an opcode A */
-            /* 
-             *  mov.d [reg], reg
-                mov.d [reg + reg], reg
-                mov.d [reg + num], reg
-                mov.d [HEAP + reg], reg
-                mov.d [HEAP + num], reg
-                mov.d [HEAP + reg + num], reg*/
-            if (GetAnyRefType(opCtx.source) == AnyRefType.REGISTER)
-            {
-                StoreRegisterToAddressOpcode opTyped = new StoreRegisterToAddressOpcode();
-
-                opTyped.BitWidth = Enum.Parse<BitWidthType>(opCtx.bitWidth.Text, true);
-                if (opCtx.@base != null)
-                {
-                    opTyped.AddressRegister = Convert.ToUInt32(ParseRegRef(opCtx.@base, cheat).Substring(1), 16);
-                }
-                opTyped.SourceRegister = Convert.ToUInt32(ParseAnyRef(opCtx.source, AnyRefType.REGISTER, cheat).Substring(1), 16);
-                if (opCtx.increment != null)
-                {
-                    opTyped.IncrementFlag = true;
-                }
-                opTyped.OffsetType = 0;
-
-                if (opCtx.memType != null)
-                {
-                    opTyped.MemType = Enum.Parse<MemoryAccessType>(opCtx.memType.Text);
-                    /* has to be OffsetType 3,4,5 */
-                    bool hasReg = opCtx.@base != null;
-                    bool hasVal = opCtx.immediate != null;
-
-                    if (hasReg && hasVal)
-                    {
-                        /* type 5 */
-                        opTyped.OffsetType = 5;
-                        opTyped.OffsetRegister = Convert.ToUInt16(ParseRegRef(opCtx.@base, cheat).Substring(1), 16);
-                        opTyped.RelativeAddress = Convert.ToUInt64(ParseAnyRef(opCtx.immediate, AnyRefType.NUMBER, cheat), 16);
-                    }
-                    else if (hasReg)
-                    {
-                        /* type 3 */
-                        opTyped.OffsetType = 3;
-                        opTyped.OffsetRegister = Convert.ToUInt16(ParseRegRef(opCtx.@base, cheat).Substring(1), 16);
-                    }
-                    else if (hasVal)
-                    {
-                        /* type 4 */
-                        opTyped.OffsetType = 4;
-                        opTyped.RelativeAddress = Convert.ToUInt64(ParseAnyRef(opCtx.immediate, AnyRefType.NUMBER, cheat), 16);
-                    }
-                }
-                else
-                {
-                    /* has to be OffsetType 1,2 */
-                    if (opCtx.offset != null)
-                    {
-                        if (GetAnyRefType(opCtx.offset) == AnyRefType.NUMBER)
-                        {
-                            opTyped.RelativeAddress = Convert.ToUInt64(ParseAnyRef(opCtx.offset, AnyRefType.NUMBER, cheat), 16);
-                            opTyped.OffsetType = 2;
-                        }
-                        else if (GetAnyRefType(opCtx.offset) == AnyRefType.REGISTER)
-                        {
-                            opTyped.OffsetRegister = Convert.ToUInt16(ParseAnyRef(opCtx.offset, AnyRefType.REGISTER, cheat).Substring(1), 16);
-                            opTyped.OffsetType = 1;
-                        }
-                    }
-                }
-                cheat.Opcodes.Add(opTyped);
-                return;
-            }
-            throw new AssemblerException("Unable to assemble mov instruction: " + opCtx.ToStringTree());
-
+            opTyped.Value = Convert.ToUInt64(ParseNumRef(opCtx.value), 16);
+            cheat.Opcodes.Add(opTyped);
         }
+
+        private void AssembleOpCodeA(OpCodeAContext opCtx, Cheat cheat)
+        {
+            OpcodeAStoreRegToAddress opTyped = new OpcodeAStoreRegToAddress();
+
+            opTyped.BitWidth = Enum.Parse<BitWidthType>(opCtx.bitWidth.Text, true);
+            if (opCtx.@base != null)
+            {
+                opTyped.AddressRegister = Convert.ToUInt32(ParseRegRef(opCtx.@base, cheat).Substring(1), 16);
+            }
+            opTyped.SourceRegister = Convert.ToUInt32(ParseRegRef(opCtx.regValue, cheat).Substring(1), 16);
+            if (opCtx.increment != null)
+            {
+                opTyped.IncrementFlag = true;
+            }
+            opTyped.OffsetType = 0;
+
+            if (opCtx.memType != null)
+            {
+                opTyped.MemType = Enum.Parse<MemoryAccessType>(opCtx.memType.Text);
+                /* has to be OffsetType 3,4,5 */
+                bool hasReg = opCtx.@base != null;
+                bool hasVal = opCtx.numOffset != null;
+
+                if (hasReg && hasVal)
+                {
+                    /* type 5 */
+                    opTyped.OffsetType = 5;
+                    opTyped.OffsetRegister = Convert.ToUInt16(ParseRegRef(opCtx.@base, cheat).Substring(1), 16);
+                    opTyped.RelativeAddress = Convert.ToUInt64(ParseNumRef(opCtx.numOffset), 16);
+                }
+                else if (hasReg)
+                {
+                    /* type 3 */
+                    opTyped.OffsetType = 3;
+                    opTyped.OffsetRegister = Convert.ToUInt16(ParseRegRef(opCtx.@base, cheat).Substring(1), 16);
+                }
+                else if (hasVal)
+                {
+                    /* type 4 */
+                    opTyped.OffsetType = 4;
+                    opTyped.RelativeAddress = Convert.ToUInt64(ParseNumRef(opCtx.numOffset), 16);
+                }
+            }
+            else
+            {
+                /* has to be OffsetType 1,2 */
+                if (opCtx.regOffset != null)
+                {
+                    opTyped.OffsetType = 1;
+                    opTyped.OffsetRegister = Convert.ToUInt16(ParseRegRef(opCtx.regOffset, cheat));
+                } else if (opCtx.numOffset != null)
+                {
+                    opTyped.OffsetType = 2;
+                    opTyped.RelativeAddress = Convert.ToUInt64(ParseNumRef(opCtx.numOffset), 16);
+                }
+            }
+            cheat.Opcodes.Add(opTyped);
+        }
+
 
         private void AssembleOpCodeC1C2(OpCodeC1C2Context opCtx, Cheat cheat)
         {
@@ -555,7 +620,7 @@ namespace CheatASM
 
             if (opCtx.index != null || opCtx.reg != null)
             {
-                SaveRestoreRegisterOpcode op = new SaveRestoreRegisterOpcode();
+                OpcodeC1SaveRestoreReg op = new OpcodeC1SaveRestoreReg();
                 switch (func)
                 {
                     case "load":
@@ -600,7 +665,7 @@ namespace CheatASM
             } else if (opCtx.regs != null || opCtx.indexes != null)
             {
                 /* Op Code C2 */
-                SaveRestoreClearMaskOpcode op = new();
+                OpcodeC2SaveRestoreRegMask op = new();
                 switch (func)
                 {
                     case "load":
@@ -646,7 +711,7 @@ namespace CheatASM
 
         private void AssembleOpCodeC3(OpCodeC3Context opCtx, Cheat cheat)
         {
-            SaveLoadStaticRegisterOpcode op = new();
+            OpcodeC3ReadWriteStaticReg op = new();
             op.WriteMode = opCtx.func.Text.ToLower().Equals("save");
 
             op.StaticRegIndex = Convert.ToUInt32(opCtx.sreg.Text.Substring(2), 16);
@@ -657,12 +722,12 @@ namespace CheatASM
 
         private void AssembleOpCodeFF0(OpCodeFF0Context opCtx, Cheat cheat)
         {
-            cheat.Opcodes.Add(new PauseOpcode());
+            cheat.Opcodes.Add(new OpcodeFF0PauseProcess());
         }
 
         private void AssembleOpCodeFF1(OpCodeFF1Context opCtx, Cheat cheat)
         {
-            cheat.Opcodes.Add(new ResumeOpcode());
+            cheat.Opcodes.Add(new OpcodeFF1ResumeProcess());
         }
 
         private void AssembleOpCodeFFF(OpCodeFFFContext opCtx, Cheat cheat)
@@ -675,7 +740,7 @@ namespace CheatASM
             /*opCodeC0: (cond=CONDITIONAL) DOT (bitWidth=BIT_WIDTH) (source=regRef) COMMA LSQUARE (memType=MEM_TYPE) PLUS_SIGN (offset=anyRef) RSQUARE
 		            | (cond=CONDITIONAL) DOT (bitWidth=BIT_WIDTH) (source=regRef) COMMA LSQUARE (addrReg=regRef) PLUS_SIGN (offset=anyRef) RSQUARE
             		| (cond=CONDITIONAL) DOT (bitWidth=BIT_WIDTH) (source=regRef) COMMA (value=anyRef);*/
-            RegisterConditionalOpcode opTyped = new RegisterConditionalOpcode();
+            OpcodeC0RegisterConditional opTyped = new OpcodeC0RegisterConditional();
 
             opTyped.BitWidth = Enum.Parse<BitWidthType>(opCtx.bitWidth.Text, true);
             opTyped.Condition = Enum.Parse<ConditionalComparisonType>(opCtx.cond.Text, true);
@@ -736,7 +801,7 @@ namespace CheatASM
 
         private void AssembleOpCode9(OpCode9Context opCtx, Cheat cheat)
         {
-            ArithmeticOpcode opTyped = new ArithmeticOpcode();
+            Opcode9Arithmetic opTyped = new Opcode9Arithmetic();
             
 
             opTyped.BitWidth = Enum.Parse<BitWidthType>(opCtx.bitWidth.Text, true);
@@ -764,7 +829,7 @@ namespace CheatASM
 
         private void AssembleOpCode8(OpCode8Context opCtx, Cheat cheat)
         {
-            KeypressConditionalOpcode opTyped = new KeypressConditionalOpcode();
+            Opcode8KeypressConditional opTyped = new Opcode8KeypressConditional();
 
             opTyped.Mask = Enum.Parse<KeyMask>(opCtx.key.Text);
             cheat.Opcodes.Add(opTyped);
@@ -772,7 +837,7 @@ namespace CheatASM
 
         private void AssembleOpCode7(OpCode7Context opCtx, Cheat cheat)
         {
-            LegacyArithmeticOpcode opTyped = new LegacyArithmeticOpcode();
+            Opcode7LegacyArithmetic opTyped = new Opcode7LegacyArithmetic();
             
 
             opTyped.BitWidth = Enum.Parse<BitWidthType>(opCtx.bitWidth.Text, true);
@@ -784,12 +849,18 @@ namespace CheatASM
 
         private void AssembleOpCode5(OpCode5Context opCtx, Cheat cheat)
         {
-            LoadRegisterMemoryOpcode opTyped = new LoadRegisterMemoryOpcode();
+            Opcode5LoadRegWithMem opTyped = new Opcode5LoadRegWithMem();
 
             opTyped.BitWidth = Enum.Parse<BitWidthType>(opCtx.bitWidth.Text, true);
 
             opTyped.RegisterIndex = Convert.ToUInt16(ParseRegRef(opCtx.register, cheat).Substring(1), 16);
-            opTyped.Immediate = Convert.ToUInt64(ParseNumRef(opCtx.offset), 16);
+            if (opCtx.numOffset != null)
+            {
+                opTyped.Immediate = Convert.ToUInt64(ParseNumRef(opCtx.numOffset), 16);
+            } else
+            {
+                opTyped.Immediate = 0;
+            }
 
             if (opCtx.memType != null)
             {
@@ -804,7 +875,7 @@ namespace CheatASM
 
         private void AssembleOpCode4(OpCode4Context opCtx, Cheat cheat)
         {
-            LoadRegisterStaticOpcode opTyped = new LoadRegisterStaticOpcode();
+            Opcode4LoadRegWithStatic opTyped = new Opcode4LoadRegWithStatic();
 
 
             opTyped.RegisterIndex = Convert.ToUInt16(ParseRegRef(opCtx.register, cheat).Substring(1), 16);
@@ -814,7 +885,7 @@ namespace CheatASM
 
         private void AssembleOpCode3(OpCode3Context opCtx, Cheat cheat)
         {
-            LoopOpcode opTyped = new LoopOpcode();
+            Opcode3Loop opTyped = new Opcode3Loop();
 
             if (opCtx.endloop != null)
             {
@@ -832,12 +903,12 @@ namespace CheatASM
 
         private void AssembleOpCode2(OpCode2Context opCtx, Cheat cheat)
         {
-            cheat.Opcodes.Add(new EndConditionalOpcode());
+            cheat.Opcodes.Add(new Opcode2EndConditional());
         }
 
         private void AssembleOpCode1(OpCode1Context opCtx, Cheat cheat)
         {
-            ConditionalOpcode opTyped = new ConditionalOpcode();
+            Opcode1Conditional opTyped = new Opcode1Conditional();
 
             opTyped.BitWidth = Enum.Parse<BitWidthType>(opCtx.bitWidth.Text, true);
             opTyped.MemType = Enum.Parse<MemoryAccessType>(opCtx.memType.Text, true);
@@ -848,12 +919,31 @@ namespace CheatASM
             cheat.Opcodes.Add(opTyped);
         }
 
+        private void AssembleOpCode0(OpCode0Context opCtx, Cheat cheat)
+        {
+            Opcode0StoreStaticToMemory opTyped = new();
+
+            opTyped.BitWidth = Enum.Parse<BitWidthType>(opCtx.bitWidth.Text, true);
+            opTyped.MemType = Enum.Parse<MemoryAccessType>(opCtx.memType.Text, true);
+
+            opTyped.OffsetRegister = Convert.ToUInt16(ParseRegRef(opCtx.regOffset, cheat).Substring(1), 16);
+
+            if (opCtx.numOffset != null)
+            {
+                opTyped.RelativeOffset = Convert.ToUInt64(ParseNumRef(opCtx.numOffset), 16);
+            }
+
+            opTyped.Value = Convert.ToUInt64(ParseNumRef(opCtx.value), 16);
+
+            cheat.Opcodes.Add(opTyped);
+        }
+
         public void AssembleStatement(StatementContext stmt,Cheat cheat)
         {
             switch(stmt.GetRuleContext<ParserRuleContext>(0))
             {
-                case MovInstrContext op:
-                    AssembleMovInstr(op, cheat);
+                case OpCode0Context op:
+                    AssembleOpCode0(op, cheat);
                     break;
                 case OpCode1Context op:
                     AssembleOpCode1(op, cheat);
@@ -870,6 +960,9 @@ namespace CheatASM
                 case OpCode5Context op:
                     AssembleOpCode5(op, cheat);
                     break;
+                case OpCode6Context op:
+                    AssembleOpCode6(op, cheat);
+                    break;
                 case OpCode7Context op:
                     AssembleOpCode7(op, cheat);
                     break;
@@ -878,6 +971,9 @@ namespace CheatASM
                     break;
                 case OpCode9Context op:
                     AssembleOpCode9(op, cheat);
+                    break;
+                case OpCodeAContext op:
+                    AssembleOpCodeA(op, cheat);
                     break;
                 case OpCodeC0Context op:
                     AssembleOpCodeC0(op, cheat);

@@ -6,21 +6,21 @@ using System.Threading.Tasks;
 
 namespace CheatASM
 {
-    class ResumeOpcode : CheatOpcode
+    class OpcodeFF0PauseProcess : CheatOpcode
     {
-        public ResumeOpcode() { }
-        public ResumeOpcode(uint[] blocks) { }
+        public OpcodeFF0PauseProcess() { }
+        public OpcodeFF0PauseProcess(uint[] blocks) { }
         public override string ToASM()
         {
-            return "resume";
+            return "pause";
         }
 
         public override string ToByteString()
         {
-            uint[] blocks = new uint[1];
+            uint[] blocks = new uint[1];            
             SetNibble(ref blocks[0], 1, 0xF);
             SetNibble(ref blocks[0], 2, 0xF);
-            SetNibble(ref blocks[0], 3, 0x1);
+            SetNibble(ref blocks[0], 3, 0);
             SetNibble(ref blocks[0], 4, 0);
             SetNibble(ref blocks[0], 5, 0);
             SetNibble(ref blocks[0], 6, 0);

@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace CheatASM
 {
-    class SaveRestoreRegisterOpcode : CheatOpcode
+    class OpcodeC1SaveRestoreReg : CheatOpcode
     {
-        public SaveRestoreRegisterOpcode() { }
-        public SaveRestoreRegisterOpcode(uint[] blocks)
+        public OpcodeC1SaveRestoreReg() { }
+        public OpcodeC1SaveRestoreReg(uint[] blocks)
         {
             DestinationIndex = GetNibble(blocks[0], 4);
             SourceIndex = GetNibble(blocks[0], 6);

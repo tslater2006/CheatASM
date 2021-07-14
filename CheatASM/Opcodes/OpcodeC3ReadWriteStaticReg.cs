@@ -6,14 +6,14 @@ using System.Threading.Tasks;
 
 namespace CheatASM
 {
-    class SaveLoadStaticRegisterOpcode : CheatOpcode
+    class OpcodeC3ReadWriteStaticReg : CheatOpcode
     {
         public uint RegIndex;
         public uint StaticRegIndex;
         public bool WriteMode = false;
 
-        public SaveLoadStaticRegisterOpcode() { }
-        public SaveLoadStaticRegisterOpcode(uint[] blocks)
+        public OpcodeC3ReadWriteStaticReg() { }
+        public OpcodeC3ReadWriteStaticReg(uint[] blocks)
         {
             RegIndex = blocks[0] & 0xF;
             StaticRegIndex = (blocks[0] >> 4) & 0x7F;

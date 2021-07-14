@@ -7,7 +7,7 @@ using System.Text;
 
 namespace CheatASM
 {
-    public class StoreStaticToAddressOpcode : CheatOpcode
+    public class Opcode6StoreStaticToAddress : CheatOpcode
     {
         public BitWidthType BitWidth;
         public uint RegisterIndex;
@@ -16,9 +16,9 @@ namespace CheatASM
         public uint OffsetRegister;
         public UInt64 Value;
 
-        public StoreStaticToAddressOpcode() { }
+        public Opcode6StoreStaticToAddress() { }
 
-        public StoreStaticToAddressOpcode(UInt32[] blocks)
+        public Opcode6StoreStaticToAddress(UInt32[] blocks)
         {
             BitWidth = (BitWidthType)GetNibble(blocks[0], 2);
             RegisterIndex = GetNibble(blocks[0], 4);

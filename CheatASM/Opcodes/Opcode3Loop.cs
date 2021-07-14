@@ -6,15 +6,15 @@
 
 namespace CheatASM
 {
-    public class LoopOpcode : CheatOpcode
+    public class Opcode3Loop : CheatOpcode
     {
         public bool IsEnd;
         public uint RegisterIndex;
         public UInt32 Count;
 
-        public LoopOpcode() { }
+        public Opcode3Loop() { }
 
-        public LoopOpcode(uint[] blocks)
+        public Opcode3Loop(uint[] blocks)
         {
             IsEnd = GetNibble(blocks[0], 2) == 1;
             RegisterIndex = GetNibble(blocks[0], 4);

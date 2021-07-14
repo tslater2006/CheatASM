@@ -7,22 +7,22 @@ using System.Text;
 
 namespace CheatASM
 {
-    public class StoreStaticOpcode : CheatOpcode
+    public class Opcode0StoreStaticToMemory : CheatOpcode
     {
         public BitWidthType BitWidth;
         public MemoryAccessType MemType;
         public uint OffsetRegister;
-        public ulong RelativeAddress;
+        public ulong RelativeOffset;
         public UInt64 Value;
 
-        public StoreStaticOpcode() { }
+        public Opcode0StoreStaticToMemory() { }
 
-        public StoreStaticOpcode(UInt32[] blocks)
+        public Opcode0StoreStaticToMemory(UInt32[] blocks)
         {
             BitWidth = (BitWidthType)GetNibble(blocks[0], 2);
             MemType = (MemoryAccessType)GetNibble(blocks[0], 3);
             OffsetRegister = GetNibble(blocks[0], 4);
-            RelativeAddress = blocks[1];
+            RelativeOffset = blocks[1];
             if (BitWidth == BitWidthType.q)
             {
                 Value = ((UInt64)blocks[2] << 32) | blocks[3];
@@ -44,7 +44,7 @@ namespace CheatASM
             sb.Append(Enum.GetName(typeof(MemoryAccessType), MemType));
 
             sb.Append("+R").Append(OffsetRegister.ToString("X")).Append("+0x");
-            sb.Append(RelativeAddress.ToString("X"));
+            sb.Append(RelativeOffset.ToString("X"));
             sb.Append("], 0x").Append(Value.ToString("X"));
             return sb.ToString();
         }
@@ -68,9 +68,9 @@ namespace CheatASM
             SetNibble(ref blocks[0], 4, (uint)OffsetRegister);
             SetNibble(ref blocks[0], 5, 0);
             SetNibble(ref blocks[0], 6, 0);
-            SetNibble(ref blocks[0], 7, (uint)((RelativeAddress >> 36) & 0xF));
-            SetNibble(ref blocks[0], 7, (uint)((RelativeAddress >> 32) & 0xF));
-            blocks[1] = (uint)(RelativeAddress & 0xFFFFFFFF);
+            SetNibble(ref blocks[0], 7, (uint)((RelativeOffset >> 36) & 0xF));
+            SetNibble(ref blocks[0], 7, (uint)((RelativeOffset >> 32) & 0xF));
+            blocks[1] = (uint)(RelativeOffset & 0xFFFFFFFF);
             if (BitWidth == BitWidthType.q)
             {
                 blocks[2] = (uint)(Value >> 32);

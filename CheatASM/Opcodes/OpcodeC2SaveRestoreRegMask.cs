@@ -6,10 +6,10 @@ using System.Threading.Tasks;
 
 namespace CheatASM
 {
-    class SaveRestoreClearMaskOpcode : CheatOpcode
+    class OpcodeC2SaveRestoreRegMask : CheatOpcode
     {
-        public SaveRestoreClearMaskOpcode() { }
-        public SaveRestoreClearMaskOpcode(uint[] blocks)
+        public OpcodeC2SaveRestoreRegMask() { }
+        public OpcodeC2SaveRestoreRegMask(uint[] blocks)
         {
             OperandType = GetNibble(blocks[0], 3);
 

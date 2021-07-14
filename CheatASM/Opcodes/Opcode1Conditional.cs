@@ -7,7 +7,7 @@ using System.Text;
 
 namespace CheatASM
 {
-    public class ConditionalOpcode : CheatOpcode
+    public class Opcode1Conditional : CheatOpcode
     {
         public BitWidthType BitWidth;
         public MemoryAccessType MemType;
@@ -15,9 +15,9 @@ namespace CheatASM
         public UInt64 Immediate;
         public UInt64 Value;
 
-        public ConditionalOpcode() { }
+        public Opcode1Conditional() { }
 
-        public ConditionalOpcode(uint[] blocks)
+        public Opcode1Conditional(uint[] blocks)
         {
             BitWidth = (BitWidthType)GetNibble(blocks[0], 2);
             MemType = (MemoryAccessType)GetNibble(blocks[0], 3);

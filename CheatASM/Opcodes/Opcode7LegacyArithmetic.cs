@@ -7,16 +7,16 @@ using System.Text;
 
 namespace CheatASM
 {
-    public class LegacyArithmeticOpcode : CheatOpcode
+    public class Opcode7LegacyArithmetic : CheatOpcode
     {
         public BitWidthType BitWidth;
         public uint RegisterIndex;
         public RegisterArithmeticType MathType;
         public uint Value;
 
-        public LegacyArithmeticOpcode() { }
+        public Opcode7LegacyArithmetic() { }
 
-        public LegacyArithmeticOpcode(uint[] blocks)
+        public Opcode7LegacyArithmetic(uint[] blocks)
         {
             BitWidth = (BitWidthType)GetNibble(blocks[0], 2);
             RegisterIndex = GetNibble(blocks[0], 4);

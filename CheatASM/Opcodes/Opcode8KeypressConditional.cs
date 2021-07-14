@@ -6,11 +6,11 @@
 
 namespace CheatASM
 {
-    public class KeypressConditionalOpcode : CheatOpcode
+    public class Opcode8KeypressConditional : CheatOpcode
     {
         public KeyMask Mask;
-        public KeypressConditionalOpcode() { }
-        public KeypressConditionalOpcode(UInt32[] blocks)
+        public Opcode8KeypressConditional() { }
+        public Opcode8KeypressConditional(UInt32[] blocks)
         {
             Mask = (KeyMask)(blocks[0] & (0xFFFFFFF));
         }

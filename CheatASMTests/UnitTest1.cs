@@ -1,3 +1,4 @@
+using Antlr4.Runtime;
 using CheatASM;
 using NUnit.Framework;
 using System.IO;
@@ -21,8 +22,8 @@ namespace Tests
 
             Assert.AreEqual("04070000 00003456 00000789", noReg.Cheats[0].Opcodes[0].ToByteString());
 
-            asm.Variables.Add(new VariableDeclaration() { Name = "regVar", Value = "0x10", Type = ".u32", Const = false });
-            asm.Variables.Add(new VariableDeclaration() { Name = "constVar", Value = "0x10", Type = ".u32", Const = true });
+            asm.Variables.Add("regVar", new VariableDeclaration() { Name = "regVar", Value = "0x10", Type = ".u32", Const = false });
+            asm.Variables.Add("constVar", new VariableDeclaration() { Name = "constVar", Value = "0x10", Type = ".u32", Const = true });
 
             var regTest = asm.AssembleInstruction("mov.d [MAIN+regVar+constVar], 0x0");
             Assert.AreEqual("040F0000 00000010 00000000", regTest.Cheats[0].Opcodes[0].ToByteString());
@@ -83,32 +84,33 @@ namespace Tests
         {
             var asmText = @"regVar: .u32 0x0A
                             offsetConst: .u32 const 0x1234
+                            offsetConst2: .u32 const 0x4321
                             .cheat ""Always 10 coins""
                             mov.d[R0 + offsetConst], regVar
+                            mov.d[R0 + offsetConst2], regVar
                             mov.d regVar, offsetConst";
+
+            AntlrInputStream stream = new AntlrInputStream(asmText);
+            CheatASMLexer lexer = new CheatASMLexer(stream);
+
+            CheatASMParser parser = new CheatASMParser(new CommonTokenStream(lexer));
+            parser.ErrorHandler = new DefaultErrorStrategy();
+            parser.TrimParseTree = true;
+            parser.BuildParseTree = true;
+            var decls = parser.variableDecl();
+
 
             var result = asm.AssembleString(asmText);
         }
             
-        [Test]
-        public void TestMovInstruction()
-        {
-            var asmText = File.ReadAllText(@"C:\Users\tslat\source\repos\CheatASM\CheatASM\examples\mov_instructions.asm");
-            var result = asm.AssembleString(asmText);
-        }
 
         [Test]
         public void TestSaveRestore()
         {
-            var result = asm.AssembleString("savereg R0, 0x1");
-            result = asm.AssembleString("savereg R1, 0x1");
-            result = asm.AssembleString("save R0, R1");
-            result = asm.AssembleString("saveall");
-
-            result = asm.AssembleString("loadreg 0x1, R0");
-            result = asm.AssembleString("loadreg 0x1, R1");
-            result = asm.AssembleString("load R0, R1");
-            result = asm.AssembleString("loadall");
+            var result = asm.AssembleString("save.reg 0x1, R0");
+            result = asm.AssembleString("save.regs R0, R1");
+            result = asm.AssembleString("load.reg R0, 0x1");
+            result = asm.AssembleString("load.regs R0, R1");
         }
     }
 }

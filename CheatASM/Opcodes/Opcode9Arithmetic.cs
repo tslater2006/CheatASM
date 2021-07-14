@@ -7,7 +7,7 @@ using System.Text;
 
 namespace CheatASM
 {
-    public class ArithmeticOpcode : CheatOpcode
+    public class Opcode9Arithmetic : CheatOpcode
     {
         public BitWidthType BitWidth;
         public RegisterArithmeticType MathType;
@@ -16,9 +16,9 @@ namespace CheatASM
         public uint RegisterRight;
         public ulong Value;
         public bool RightHandRegister;
-        public ArithmeticOpcode() { }
+        public Opcode9Arithmetic() { }
 
-        public ArithmeticOpcode(uint[] blocks)
+        public Opcode9Arithmetic(uint[] blocks)
         {
             BitWidth = (BitWidthType)GetNibble(blocks[0], 2);
             MathType = (RegisterArithmeticType)GetNibble(blocks[0], 3);

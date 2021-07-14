@@ -68,7 +68,7 @@ opCodeFF1: (func=RESUME);
 
 opCodeFFF: (func=LOG) DOT (bitWidth=BIT_WIDTH) (id=HEX_NUMBER) COMMA LSQUARE (memType=MEM_TYPE) (PLUS_SIGN (offset=anyRef))? RSQUARE
         |  (func=LOG) DOT (bitWidth=BIT_WIDTH) (id=HEX_NUMBER) COMMA LSQUARE (addrReg=regRef) (PLUS_SIGN (offset=anyRef))? RSQUARE
-        |  (func=LOG) DOT (bitWidth=BIT_WIDTH) (id=HEX_NUMBER) COMMA (value=anyRef);
+        |  (func=LOG) DOT (bitWidth=BIT_WIDTH) (id=HEX_NUMBER) COMMA (value=regRef);
 
 numberLiteral : IntegerLiteral | DecimalLiteral | HEX_NUMBER;
 regRef: (reg=REGISTER) | (var=VARIABLE_NAME);

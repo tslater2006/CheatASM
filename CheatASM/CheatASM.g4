@@ -13,8 +13,12 @@ statement: opCode1
          | opCode9
          | movInstr
 		 | opCodeC0
-		 | opCodeC1
-		 | opCodeC2;
+		 | opCodeC1C2
+		 | opCodeC3
+		 | opCodeFF0
+		 | opCodeFF1
+		 | opCodeFFF
+		 | COMMENT_LINE;
 
 cheatEntry: (header=cheatHeader) statement+;
 
@@ -66,17 +70,28 @@ mov.d [HEAP + reg + num], reg
 
 
 opCodeC0: (cond=CONDITIONAL) DOT (bitWidth=BIT_WIDTH) (source=regRef) COMMA LSQUARE (memType=MEM_TYPE) PLUS_SIGN (offset=anyRef) RSQUARE
-
 		| (cond=CONDITIONAL) DOT (bitWidth=BIT_WIDTH) (source=regRef) COMMA LSQUARE (addrReg=regRef) PLUS_SIGN (offset=anyRef) RSQUARE
-
 		| (cond=CONDITIONAL) DOT (bitWidth=BIT_WIDTH) (source=regRef) COMMA (value=anyRef);
 
-opCodeC1: (func=SAVEREG) (reg=regRef) COMMA (index=numRef)
-        | (func=LOADREG) (index=numRef) COMMA (reg=regRef);
+opCodeC1C2: (func=SAVE) DOT (type=REG) (index=numRef) COMMA (reg=regRef)
+        | (func=LOAD) DOT (type=REG) (reg=regRef) COMMA (index=numRef)
+        | (func=SAVE) DOT (type=REGS) (regs=regList)
+        | (func=LOAD) DOT (type=REGS) (regs=regList)
+        | (func=CLEAR) DOT (type=REG) (reg=regRef)
+        | (func=CLEAR) DOT (type=SAVED) (index=numRef)
+        | (func=CLEAR) DOT (type=REGS) (regs=regList)
+        | (func=CLEAR) DOT (type=SAVED) (indexes=indexList);
 
+opCodeC3: (func=SAVE) DOT (type=STATIC) (sreg=SREGISTER) COMMA (reg=regRef)
+        | (func=LOAD) DOT (type=STATIC) (reg=regRef) COMMA (sreg=SREGISTER);
 
-opCodeC2: (func=SAVE|func=LOAD) regRef (COMMA regRef)+
-        | (func=SAVEALL|func=LOADALL);
+opCodeFF0: (func=PAUSE);
+
+opCodeFF1: (func=RESUME);
+
+opCodeFFF: (func=LOG) DOT (bitWidth=BIT_WIDTH) (id=HEX_NUMBER) COMMA LSQUARE (memType=MEM_TYPE) PLUS_SIGN (offset=anyRef) RSQUARE
+        |  (func=LOG) DOT (bitWidth=BIT_WIDTH) (id=HEX_NUMBER) COMMA LSQUARE (addrReg=regRef) PLUS_SIGN (offset=anyRef) RSQUARE
+        |  (func=LOG) DOT (bitWidth=BIT_WIDTH) (id=HEX_NUMBER) COMMA (value=anyRef);
 
 numberLiteral : IntegerLiteral | DecimalLiteral | HEX_NUMBER;
 regRef: (reg=REGISTER) | (var=VARIABLE_NAME);
@@ -86,6 +101,9 @@ numRef: (num=HEX_NUMBER) | (var=VARIABLE_NAME);
 anyRef: (reg=REGISTER) | (num=HEX_NUMBER) | (var=VARIABLE_NAME);
 
 variableDecl:  (name=VARIABLE_NAME) COLON (type=VARIABLE_TYPE) (const=CONST)? (val=numberLiteral);
+
+regList: (reg=regRef) (COMMA regRef)*;
+indexList: (index=numRef) (COMMA numRef)*;
 
 // Lexer Rules
 MOVE: M O V;
@@ -101,6 +119,14 @@ SAVEALL: S A V E A L L;
 LOAD: L O A D;
 LOADREG: L O A D R E G;
 LOADALL: L O A D A L L;
+CLEAR: C L E A R;
+REG: R E G;
+REGS: R E G S;
+SAVED: S A V E D;
+PAUSE: P A U S E;
+RESUME: R E S U M E;
+STATIC: S T A T I C;
+LOG: L O G;
 LSQUARE: '[';
 RSQUARE: ']';
 LCURL: '{';
@@ -180,20 +206,21 @@ CONST: C O N S T;
 MASTER: M A S T E R;
 
 REGISTER: [Rr][0-9a-fA-F];
+SREGISTER: [Ss][Rr][0-9a-fA-F]+;
 HEX_NUMBER: '0' X [0-9a-fA-F]+;
 WS: [ \t\r\n]+ -> skip;
-COMMENT: '#'.* -> skip;
 DOT: '.';
 COLON: ':';
 VARIABLE_NAME: [A-Za-z][A-Za-z0-9]*;
 DecimalLiteral  : IntegerLiteral '.' [0-9]+ ;
 IntegerLiteral  : '0' | '1'..'9' '0'..'9'* ;
-
 VARIABLE_TYPE: DOT ((U | S) ('8' | '16' | '32' | '64') | F ('32' | '64'));
 
 ID:  '{'[0-9A-Fa-f]+ '}' ;
 
 CHEAT_NAME: '"' [0-9A-Za-z \\.()_]+ '"';
+
+COMMENT_LINE: '#'  ~[\n\r]* -> skip;
 
 fragment A : [aA]; // match either an 'a' or 'A'
 fragment B : [bB];

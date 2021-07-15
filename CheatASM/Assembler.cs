@@ -92,7 +92,7 @@ namespace CheatASM
         static string[] RegisterList = { "R0", "R1", "R2", "R3", "R4", "R5", "R6", "R7", "R8", "R9", "RA", "RB", "RC", "RD", "RE", "RF" };
         public Dictionary<string,VariableDeclaration> Variables = new Dictionary<string,VariableDeclaration>();
         HashSet<String> SeenRegisters = new HashSet<string>();
-
+        string parsingContent = null;
         string errorMsg;
         int errorPos;
         public override void SyntaxError([NotNull] IRecognizer recognizer, [Nullable] IToken offendingSymbol, int line, int charPositionInLine, [NotNull] string msg, [Nullable] RecognitionException e)
@@ -162,7 +162,7 @@ namespace CheatASM
         {
 
             contents = PreProcessConstants(contents);
-
+            parsingContent = contents;
             AntlrInputStream stream = new AntlrInputStream(contents);
             CheatASMLexer lexer = new CheatASMLexer(stream);
 
@@ -915,10 +915,17 @@ namespace CheatASM
             else
             {
                 opTyped.UseReg = true;
+                if (!ParseRegRef(opCtx.register,cheat).Equals(ParseRegRef(opCtx.baseRegister,cheat)))
+                {
+                    throw new AssemblerException($"On line: {opCtx.Start.Line} instruction: \"{GetCurrentInstructionText(opCtx)}\", Both the destination and source registers must be the same");
+                }
             }
             cheat.Opcodes.Add(opTyped);
         }
-
+        private string GetCurrentInstructionText(ParserRuleContext ctx)
+        {
+            return parsingContent.Substring(ctx.Start.StartIndex, ctx.stop.StopIndex - ctx.start.StartIndex + 1);
+        }
         private void AssembleOpCode4(OpCode4Context opCtx, Cheat cheat)
         {
             Opcode4LoadRegWithStatic opTyped = new Opcode4LoadRegWithStatic();

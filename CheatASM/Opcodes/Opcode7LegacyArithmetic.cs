@@ -43,7 +43,7 @@ namespace CheatASM
                 case RegisterArithmeticType.or:
                 case RegisterArithmeticType.not:
                 case RegisterArithmeticType.xor:
-                case RegisterArithmeticType.none:
+                case RegisterArithmeticType.copy:
                     return "# Math function '" + Enum.GetName(typeof(RegisterArithmeticType), MathType) + "' not supported by in this form. (Use opcode 0x9 form)";
             }
             /* 7T0RC000 VVVVVVVV */

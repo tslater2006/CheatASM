@@ -51,12 +51,18 @@ namespace CheatASM
             sb.Append(".").Append(Enum.GetName(typeof(BitWidthType), BitWidth));
             sb.Append(" R").Append(RegisterDest.ToString("X"));
             sb.Append(", R").Append(RegisterLeft.ToString("X"));
-            if (RightHandRegister)
+
+            /* don't print a right hand operand for not/copy which */
+            if (MathType != RegisterArithmeticType.not && MathType != RegisterArithmeticType.copy)
             {
-                sb.Append(", R").Append(RegisterRight.ToString("X"));
-            } else
-            {
-                sb.Append(", 0x").Append(Value.ToString("X"));
+                if (RightHandRegister)
+                {
+                    sb.Append(", R").Append(RegisterRight.ToString("X"));
+                }
+                else
+                {
+                    sb.Append(", 0x").Append(Value.ToString("X"));
+                }
             }
 
             return sb.ToString();
@@ -65,12 +71,19 @@ namespace CheatASM
         public override string ToByteString()
         {
             uint[] blocks = null;
-            if (BitWidth == BitWidthType.q)
+            if (BitWidth == BitWidthType.q && RightHandRegister == false)
             {
                 blocks = new uint[3];
             } else
             {
-                blocks = new uint[2];
+                if (MathType == RegisterArithmeticType.not || MathType == RegisterArithmeticType.copy || RightHandRegister)
+                {
+                    blocks = new uint[1];
+                } else
+                {
+                    blocks = new uint[2];
+                }
+
             }
 
             SetNibble(ref blocks[0], 1, 9);
@@ -89,18 +102,20 @@ namespace CheatASM
             }
             SetNibble(ref blocks[0], 8, 0);
 
-            if (!RightHandRegister)
+            /* no immediate blocks for Not and Copy operations */
+            if (blocks.Length > 1)
             {
                 if (BitWidth == BitWidthType.q)
                 {
                     blocks[1] = (uint)(Value >> 32);
                     blocks[2] = (uint)(Value & 0xFFFFFFFF);
-                } else
+                }
+                else
                 {
                     blocks[1] = (UInt32)Value;
                 }
-            }
 
+            }
             return GetBlocksAsString(blocks);
         }
     }

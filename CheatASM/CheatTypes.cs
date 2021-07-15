@@ -59,7 +59,7 @@ namespace CheatASM
         not = 7,
         xor = 8,
 
-        none = 9,
+        copy = 9,
     };
 
     public enum StoreRegisterOffsetType : uint

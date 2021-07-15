@@ -137,7 +137,8 @@ NE: N E;
 
 // arithmetic
 LEGACY_ARITHMETIC: ADD | SUB | MUL | LSH | RSH ;
-ARITHMETIC: AND | OR | NOT | XOR | NONE;
+ARITHMETIC: AND | OR  | XOR ;
+NO_RIGHT_HAND_ARITH: NOT | COPY;
 
 ADD: A D D;
 SUB: S U B;
@@ -149,6 +150,7 @@ OR: O R;
 NOT: N O T;
 XOR: X O R;
 NONE: N O N E;
+COPY: C O P Y;
 
 // keys
 KEY: A_KEY | B_KEY | X_KEY | Y_KEY | LSP_KEY | RSP_KEY | L_KEY

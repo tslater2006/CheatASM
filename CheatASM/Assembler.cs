@@ -876,7 +876,14 @@ namespace CheatASM
         {
             Opcode8KeypressConditional opTyped = new Opcode8KeypressConditional();
 
-            opTyped.Mask = Enum.Parse<KeyMask>(opCtx.key.Text);
+            try
+            {
+                opTyped.Mask = Enum.Parse<KeyMask>(opCtx.key.Text);
+            }
+            catch (Exception ex)
+            {
+                throw new AssemblerException($"On line: {opCtx.Start.Line} instruction: \"{GetCurrentInstructionText(opCtx)}\", The key \"{opCtx.key.Text}\" is not valid.");
+            }
             cheat.Opcodes.Add(opTyped);
         }
 

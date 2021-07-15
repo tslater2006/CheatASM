@@ -33,9 +33,13 @@ opCode3: LOOP (register=regRef) COMMA(value=numRef)
        | (endloop=END_LOOP) (register=regRef);
 
 opCode7: (func=LEGACY_ARITHMETIC) DOT (bitWidth=BIT_WIDTH) (register=regRef) COMMA (value=numRef);
-opCode8: KEYCHECK (key=KEY);
 
-opCode9: (func=ARITHMETIC) DOT (bitWidth=BIT_WIDTH) (dest=regRef) COMMA (leftReg=regRef) COMMA (right=anyRef);
+/* lexing hack to get B to work, assembler will complain if W/D/Q are used */
+opCode8: KEYCHECK (key=(BIT_WIDTH|KEY));
+
+opCode9: (func=LEGACY_ARITHMETIC) DOT (bitWidth=BIT_WIDTH) (dest=regRef) COMMA (leftReg=regRef) COMMA (right=anyRef)
+        | (func=ARITHMETIC) DOT (bitWidth=BIT_WIDTH) (dest=regRef) COMMA (leftReg=regRef) COMMA (right=anyRef)
+        | (func=NO_RIGHT_HAND_ARITH) DOT (bitWidth=BIT_WIDTH) (dest=regRef) COMMA (leftReg=regRef);
 
 movInstr: MOVE DOT (bitWidth=BIT_WIDTH) LSQUARE (memType=MEM_TYPE) PLUS_SIGN (regOffset=regRef) (PLUS_SIGN (numOffset=numRef))? RSQUARE COMMA (value=numRef) #opCode0
         | MOVE (DOT (bitWidth=BIT_WIDTH))? (register=regRef) COMMA (value=numRef) # opCode4

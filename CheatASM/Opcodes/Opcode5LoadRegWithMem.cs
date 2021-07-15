@@ -23,14 +23,7 @@ namespace CheatASM
             MemType = (MemoryAccessType)GetNibble(blocks[0], 3);
             RegisterIndex = GetNibble(blocks[0], 4);
             UseReg = GetNibble(blocks[0], 5) == 1;
-            if (UseReg)
-            {
-                Immediate = ((UInt64)(blocks[0] & 0xFF) << 32) + blocks[1];
-            }
-            else
-            {
-                Immediate = blocks[1];
-            }
+            Immediate = ((UInt64)(blocks[0] & 0xFF) << 32) + blocks[1];
         }
 
         public override string ToASM()

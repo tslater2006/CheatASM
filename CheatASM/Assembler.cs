@@ -551,6 +551,7 @@ namespace CheatASM
             }
 
             opTyped.Value = Convert.ToUInt64(ParseNumRef(opCtx.value), 16);
+            CheckValueFitsBitWidth(opTyped.BitWidth, opTyped.Value);
             cheat.Opcodes.Add(opTyped);
         }
 
@@ -823,6 +824,7 @@ namespace CheatASM
                 if (GetAnyRefType(opCtx.value) == AnyRefType.NUMBER)
                 {
                     opTyped.Value = Convert.ToUInt64(ParseAnyRef(opCtx.value, AnyRefType.NUMBER, cheat), 16);
+                    CheckValueFitsBitWidth(opTyped.BitWidth, opTyped.Value);
                     opTyped.OperandType = 4;
                 }
                 else if (GetAnyRefType(opCtx.offset) == AnyRefType.REGISTER)
@@ -858,6 +860,7 @@ namespace CheatASM
                 {
                     opTyped.RightHandRegister = false;
                     opTyped.Value = opTyped.Value = Convert.ToUInt64(ParseAnyRef(opCtx.right, AnyRefType.NUMBER, cheat), 16);
+                    CheckValueFitsBitWidth(opTyped.BitWidth, opTyped.Value);
                 }
                 else if (GetAnyRefType(opCtx.right) == AnyRefType.REGISTER)
                 {
@@ -886,6 +889,7 @@ namespace CheatASM
             opTyped.RegisterIndex = Convert.ToUInt16(ParseRegRef(opCtx.register, cheat).Substring(1), 16);
             opTyped.MathType = Enum.Parse<RegisterArithmeticType>(opCtx.func.Text, true);
             opTyped.Value = Convert.ToUInt32(ParseNumRef(opCtx.value), 16);
+            CheckValueFitsBitWidth(opTyped.BitWidth, opTyped.Value);
             cheat.Opcodes.Add(opTyped);
         }
 
@@ -922,6 +926,14 @@ namespace CheatASM
 
             opTyped.RegisterIndex = Convert.ToUInt16(ParseRegRef(opCtx.register, cheat).Substring(1), 16);
             opTyped.Value = Convert.ToUInt64(ParseNumRef(opCtx.value), 16);
+
+            /* not strictly needed by Atmosphere, as the bitwidth isn't encoded... but if they provided it we should check the literal fits */
+            if (opCtx.bitWidth != null)
+            {
+                var bitWidth = Enum.Parse<BitWidthType>(opCtx.bitWidth.Text, true);
+                CheckValueFitsBitWidth(bitWidth, opTyped.Value);
+            }
+
             cheat.Opcodes.Add(opTyped);
         }
 
@@ -958,6 +970,9 @@ namespace CheatASM
             opTyped.Condition = Enum.Parse<ConditionalComparisonType>(opCtx.cond.Text, true);
             opTyped.Immediate = Convert.ToUInt64(ParseNumRef(opCtx.offset), 16);
             opTyped.Value = Convert.ToUInt64(ParseNumRef(opCtx.value), 16);
+
+            CheckValueFitsBitWidth(opTyped.BitWidth, opTyped.Value);
+
             cheat.Opcodes.Add(opTyped);
         }
 

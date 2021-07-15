@@ -1,6 +1,7 @@
 using Antlr4.Runtime;
 using CheatASM;
 using NUnit.Framework;
+using System;
 using System.Collections.Generic;
 using System.IO;
 
@@ -204,6 +205,59 @@ namespace Tests
             {
                 asm.AssembleSingleInstruction("mul.b R3,  0x1234");
             });
+        }
+
+        [Test]
+        public void TestOpcode8()
+        {
+            foreach(var val in Enum.GetNames(typeof(KeyMask)))
+            {
+                var enumVal = (uint)(Enum.Parse(typeof(KeyMask), val));
+                Assert.AreEqual(asm.AssembleSingleInstruction($"keycheck {val})"), $"8{enumVal.ToString("X7")}");
+            }
+
+            Assert.Throws<AssemblerException>(() =>
+            {
+                asm.AssembleSingleInstruction("keycheck Q");
+            });
+        }
+
+
+        [Test]
+        public void TestOpcode9()
+        {
+            /* (func=ARITHMETIC) DOT (bitWidth=BIT_WIDTH) (dest=regRef) COMMA (leftReg=regRef) COMMA (right=anyRef); */
+
+            Dictionary<string, string> instructions = new()
+            {
+                { "add.b R7, R3, 0x12", "91073100 00000012" },
+                { "sub.w R4, R1, 0x12", "92141100 00000012" },
+                { "mul.d R3, R0, 0x12", "94230100 00000012" },
+                { "lsh.q RB, RD, 0x112233445566", "983BD100 00001122 33445566" },
+                { "rsh.d R4, R7, 0x55667788", "94447100 55667788" },
+                { "and.b R7, R3, 0x12", "91573100 00000012" },
+                { "or.b R7, R3, 0x12", "91673100 00000012" },
+                { "xor.b R7, R3, 0x12", "91873100 00000012" },
+                { "add.b R7, R3, R2", "91073020" },
+                { "sub.w R4, R1, R2", "92141020" },
+                { "mul.d R3, R0, R7", "94230070" },
+                { "lsh.q RB, RD, R8", "983BD080" },
+                { "rsh.d R4, R7, R1", "94447010" },
+                { "and.b R7, R3, R0", "91573000" },
+                { "or.b R7, R3, R4", "91673040" },
+                { "xor.b R7, R3, R6", "91873060" },
+                { "not.b R7, R3", "91773100" },
+                { "copy.b R7, R3", "91973100" },
+            };
+
+            foreach (var kvp in instructions)
+            {
+                var assembledInstruction = asm.AssembleSingleInstruction(kvp.Key);
+                Console.WriteLine(assembledInstruction);
+                //Assert.AreEqual(assembledInstruction, kvp.Value, $"Assembly of '{kvp.Key}' gave '{assembledInstruction}' instead of '{kvp.Value}'");
+            }
+
+
         }
     }
     

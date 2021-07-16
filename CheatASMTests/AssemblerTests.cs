@@ -5,17 +5,15 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 
-namespace Tests
+namespace CheatASMTests
 {
     public class AssemblerTests
     {
         Assembler asm;
-        Disassembler disasm;
         [SetUp]
         public void Setup()
         {
             asm = new Assembler();
-            disasm = new Disassembler();
         }
 
         [Test]
@@ -246,8 +244,8 @@ namespace Tests
                 { "and.b R7, R3, R0", "91573000" },
                 { "or.b R7, R3, R4", "91673040" },
                 { "xor.b R7, R3, R6", "91873060" },
-                { "not.b R7, R3", "91773100" },
-                { "copy.b R7, R3", "91973100" },
+                { "not.b R7, R3", "91773000" },
+                { "copy.b R7, R3", "91973000" },
             };
 
             foreach (var kvp in instructions)
@@ -275,9 +273,9 @@ namespace Tests
                 { "mov.d [RB + R1], R4 inc", "A44B1110" },
                 { "mov.d [RC + 0x123], R5", "A45C0200 00000123" },
                 { "mov.d [RD + 0x123], R6 inc", "A46D1200 00000123" },
-                { "mov.d [MAIN + RE], R7 inc", "A47E0300" },
-                { "mov.d [MAIN + 0x123], R7 inc", "A4700400 00000123" },
-                { "mov.d [HEAP + RF + 0x123456789], R8 inc", "A48F0511 23456789" }
+                { "mov.d [MAIN + RE], R7", "A47E0300" },
+                { "mov.d [MAIN + 0x123], R7", "A4700400 00000123" },
+                { "mov.d [HEAP + RF + 0x123456789], R8", "A48F0511 23456789" }
             };
 
             foreach (var kvp in instructions)
@@ -301,9 +299,9 @@ namespace Tests
             {
                 { ".b R0, R1", "C01_0510" },
                 { ".w R0, 0x123", "C02_0400 00000123" },
-                { ".d R0, [R1]", "C04_0200 00000000" },
-                { ".q R0, [R1 + 0x123]", "C08_0200 00000123" },
-                { ".b R0, [R1 + R2]", "C01_0302" },
+                { ".d R0, [R1]", "C04_0210 00000000" },
+                { ".q R0, [R1 + 0x123]", "C08_0210 00000123" },
+                { ".b R0, [R1 + R2]", "C01_0312" },
                 { ".w R0, [MAIN + 0x123]", "C02_0000 00000123" },
                 { ".d R0, [HEAP + 0x123]", "C04_0010 00000123" },
                 { ".q R0, [MAIN]", "C08_0000 00000000" },
@@ -457,6 +455,30 @@ namespace Tests
                 Assert.AreEqual(assembledInstruction, kvp.Value, $"Assembly of '{kvp.Key}' gave '{assembledInstruction}' instead of '{kvp.Value}'");
             }
 
+
+        }
+
+        [Test]
+        public void TestVariables()
+        {
+            var programText = @"
+                                floatTest: .f32 4.83
+                                mainOffset: .u32 const 0x1234
+                                coinOffset: .u32 const 0x12
+                                ten: .u32 0xA
+
+                                .cheat master ""Setup""
+                                mov.d[R0 + 0x123], floatTest
+                                mov.q R0, [MAIN + mainOffset]
+
+                                .cheat ""Sample""
+                                mov.d[R0 + mainOffset], R7
+                                mov.q R0, [MAIN + mainOffset]";
+
+
+
+
+            var assembledText = asm.AssembleString(programText).ToString();
 
         }
     }

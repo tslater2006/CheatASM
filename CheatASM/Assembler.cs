@@ -770,6 +770,7 @@ namespace CheatASM
             }
             else if (opCtx.addrReg != null)
             {
+                opTyped.AddressRegister = Convert.ToUInt32(ParseRegRef(opCtx.addrReg, cheat).Substring(1),16);
                 /* operand type is either 2 or 3 */
                 if (opCtx.offset == null || GetAnyRefType(opCtx.offset) == AnyRefType.NUMBER)
                 {
@@ -830,6 +831,9 @@ namespace CheatASM
                     opTyped.RightHandRegister = true;
                     opTyped.RegisterRight = Convert.ToUInt16(ParseAnyRef(opCtx.right, AnyRefType.REGISTER, cheat).Substring(1), 16);
                 }
+            } else
+            {
+                opTyped.NoRightHandOperand = true;
             }
 
             cheat.Opcodes.Add(opTyped);

@@ -52,11 +52,23 @@ namespace CheatASM
             switch (OperandType)
             {
                 case 0:
-                    return $"log.{Enum.GetName(typeof(BitWidthType), BitWidth)} 0x{LogId:X}, [{Enum.GetName(typeof(MemoryAccessType), MemType)} + 0x{RelativeAddress:X}]";
+                    if (RelativeAddress > 0)
+                    {
+                        return $"log.{Enum.GetName(typeof(BitWidthType), BitWidth)} 0x{LogId:X}, [{Enum.GetName(typeof(MemoryAccessType), MemType)} + 0x{RelativeAddress:X}]";
+                    }else
+                    {
+                        return $"log.{Enum.GetName(typeof(BitWidthType), BitWidth)} 0x{LogId:X}, [{Enum.GetName(typeof(MemoryAccessType), MemType)}]";
+                    }
                 case 1:
                     return $"log.{Enum.GetName(typeof(BitWidthType), BitWidth)} 0x{LogId:X}, [{Enum.GetName(typeof(MemoryAccessType), MemType)} + R{OffsetRegister:X}]";
                 case 2:
-                    return $"log.{Enum.GetName(typeof(BitWidthType), BitWidth)} 0x{LogId:X}, [R{AddressRegister:X} + 0x{RelativeAddress:X}]";
+                    if (RelativeAddress > 0)
+                    {
+                        return $"log.{Enum.GetName(typeof(BitWidthType), BitWidth)} 0x{LogId:X}, [R{AddressRegister:X} + 0x{RelativeAddress:X}]";
+                    }else
+                    {
+                        return $"log.{Enum.GetName(typeof(BitWidthType), BitWidth)} 0x{LogId:X}, [R{AddressRegister:X}]";
+                    }
                 case 3:
                     return $"log.{Enum.GetName(typeof(BitWidthType), BitWidth)} 0x{LogId:X}, [R{AddressRegister:X} + R{OffsetRegister:X}]";
                 case 4:

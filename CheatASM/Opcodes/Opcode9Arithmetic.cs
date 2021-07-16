@@ -16,6 +16,7 @@ namespace CheatASM
         public uint RegisterRight;
         public ulong Value;
         public bool RightHandRegister;
+        public bool NoRightHandOperand;
         public Opcode9Arithmetic() { }
 
         public Opcode9Arithmetic(uint[] blocks)
@@ -27,6 +28,10 @@ namespace CheatASM
 
             if (GetNibble(blocks[0], 6) == 0)
             {
+                if (MathType == RegisterArithmeticType.not || MathType == RegisterArithmeticType.copy)
+                {
+                    NoRightHandOperand = true;
+                }
                 RightHandRegister = true;
                 RegisterRight = GetNibble(blocks[0], 7);
             }
@@ -91,7 +96,7 @@ namespace CheatASM
             SetNibble(ref blocks[0], 3, ((uint)MathType & 0xF));
             SetNibble(ref blocks[0], 4, ((uint)RegisterDest & 0xF));
             SetNibble(ref blocks[0], 5, ((uint)RegisterLeft & 0xF));
-            if (RightHandRegister)
+            if (RightHandRegister || NoRightHandOperand)
             {
                 SetNibble(ref blocks[0], 6, 0);
                 SetNibble(ref blocks[0], 7, ((uint)RegisterRight & 0xF));

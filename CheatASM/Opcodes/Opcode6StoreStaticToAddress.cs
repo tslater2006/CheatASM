@@ -37,7 +37,7 @@ namespace CheatASM
             sb.Append(" [R").Append(RegisterIndex.ToString("X"));
             if (OffsetEnableFlag)
             {
-                sb.Append("+").Append("R" + OffsetRegister.ToString("X"));
+                sb.Append(" + ").Append("R" + OffsetRegister.ToString("X"));
             }
             sb.Append("], 0x").Append(Value.ToString("X"));
             if (IncrementFlag)

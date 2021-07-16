@@ -43,8 +43,11 @@ namespace CheatASM
             {
                 sb.Append(Enum.GetName(typeof(MemoryAccessType), MemType));
             }
-
-            sb.Append("+0x").Append(Immediate.ToString("X")).Append("]");
+            if (Immediate > 0)
+            {
+                sb.Append(" + 0x").Append(Immediate.ToString("X"));
+            }
+            sb.Append("]");
             return sb.ToString();
 
 

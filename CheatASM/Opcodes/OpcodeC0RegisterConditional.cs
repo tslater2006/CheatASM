@@ -91,28 +91,34 @@ namespace CheatASM
                     /* C0TcS0M: ltb R0, [MAIN + 0x1234] */
                     sb.Append("R").Append(SourceRegister.ToString("X")).Append(", [");
                     sb.Append(Enum.GetName(typeof(MemoryAccessType), MemType));
-                    sb.Append("+0x").Append(RelativeAddress.ToString("X"));
+                    if (RelativeAddress > 0)
+                    {
+                        sb.Append(" + 0x").Append(RelativeAddress.ToString("X"));
+                    }
                     sb.Append("]");
                     break;
                 case 1:
                     /* C0TcS1Mr: ltb R0, [MAIN + R1]*/
                     sb.Append("R").Append(SourceRegister.ToString("X")).Append(", [");
                     sb.Append(Enum.GetName(typeof(MemoryAccessType), MemType));
-                    sb.Append("+R").Append(OffsetRegister.ToString("X"));
+                    sb.Append(" + R").Append(OffsetRegister.ToString("X"));
                     sb.Append("]");
                     break;
                 case 2:
                     /* C0TcS2R: ltb R0, [R1 + 0x1234] */
                     sb.Append("R").Append(SourceRegister.ToString("X")).Append(", [");
                     sb.Append("R").Append(AddressRegister.ToString("X"));
-                    sb.Append("+0x").Append(RelativeAddress.ToString("X"));                    
+                    if (RelativeAddress > 0)
+                    {
+                        sb.Append(" + 0x").Append(RelativeAddress.ToString("X"));
+                    }
                     sb.Append("]");
                     break;
                 case 3:
                     /* C0TcS3Rr: ltb R0, [R1 + R2] */
                     sb.Append("R").Append(SourceRegister.ToString("X")).Append(", [");
                     sb.Append("R").Append(AddressRegister.ToString("X"));
-                    sb.Append("+R").Append(OffsetRegister.ToString("X"));
+                    sb.Append(" + R").Append(OffsetRegister.ToString("X"));
                     sb.Append("]");
                     break;
                 case 4:
@@ -187,7 +193,7 @@ namespace CheatASM
                     SetNibble(ref blocks[0], 8, (uint)OffsetRegister);
                     break;
                 case 2:
-                    SetNibble(ref blocks[0], 7, (uint)OffsetRegister);
+                    SetNibble(ref blocks[0], 7, (uint)AddressRegister);
                     SetNibble(ref blocks[0], 8, (uint)(RelativeAddress >> 32) & 0xF);
                     blocks[1] = (uint)(RelativeAddress & 0xFFFFFFFF);
                     break;

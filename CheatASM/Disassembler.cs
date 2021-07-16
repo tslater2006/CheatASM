@@ -11,6 +11,12 @@ namespace CheatASM
     public class Disassembler
     {
         uint conditionalIndent = 0;
+
+        public void ResetIndent()
+        {
+            conditionalIndent = 0;
+        }
+
         private void WriteOpcode(CheatOpcode op, StringBuilder sb)
         {
             var indent = string.Concat(Enumerable.Repeat("  ", (int)conditionalIndent));
@@ -92,12 +98,6 @@ namespace CheatASM
                     case 'A':
                         op = new OpcodeAStoreRegToAddress(blocks);
                         WriteOpcode(op, sb);
-                        break;
-                    default:
-                        Debugger.Break();
-                        break;
-                    case 'B':
-                        /* reserved */
                         break;
                     case 'C':
                         /* Extended width set 1 */

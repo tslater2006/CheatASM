@@ -63,28 +63,28 @@ namespace CheatASM
                     break;
                 case 1:
                     sb.Append(" [R").Append(AddressRegister.ToString("X"));
-                    sb.Append("+R").Append(OffsetRegister.ToString("X")).Append("], ");
+                    sb.Append(" + R").Append(OffsetRegister.ToString("X")).Append("], ");
                     break;
                 case 2:
                     sb.Append(" [R").Append(AddressRegister.ToString("X"));
-                    sb.Append("+0x").Append(RelativeAddress.ToString("X")).Append("], ");
+                    sb.Append(" + 0x").Append(RelativeAddress.ToString("X")).Append("], ");
                     break;
                 case 3:
                     sb.Append(" [").Append(Enum.GetName(typeof(MemoryAccessType),MemType));
-                    sb.Append("+R").Append(AddressRegister.ToString("X")).Append("], ");
+                    sb.Append(" + R").Append(AddressRegister.ToString("X")).Append("], ");
                     break;
                 case 4:
                     sb.Append(" [").Append(Enum.GetName(typeof(MemoryAccessType), MemType));
-                    sb.Append("+0x").Append(RelativeAddress.ToString("X")).Append("], ");
+                    sb.Append(" + 0x").Append(RelativeAddress.ToString("X")).Append("], ");
                     break;
                 case 5:
                     sb.Append(" [").Append(Enum.GetName(typeof(MemoryAccessType), MemType));
-                    sb.Append("+R").Append(AddressRegister.ToString("X"));
-                    sb.Append("+0x").Append(RelativeAddress.ToString("X")).Append("], "); ;
+                    sb.Append(" + R").Append(AddressRegister.ToString("X"));
+                    sb.Append(" + 0x").Append(RelativeAddress.ToString("X")).Append("], "); ;
                     break;
             }
 
-            sb.Append("R").Append(SourceRegister.ToString("X")).Append(" ");
+            sb.Append("R").Append(SourceRegister.ToString("X"));
 
             if (IncrementFlag)
             {

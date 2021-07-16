@@ -43,8 +43,8 @@ namespace CheatASM
 
             sb.Append(Enum.GetName(typeof(MemoryAccessType), MemType));
 
-            sb.Append("+R").Append(OffsetRegister.ToString("X")).Append("+0x");
-            sb.Append(RelativeOffset.ToString("X"));
+            sb.Append(" + R").Append(OffsetRegister.ToString("X"));
+            if (RelativeOffset > 0) { sb.Append(" + 0x").Append(RelativeOffset.ToString("X")); }
             sb.Append("], 0x").Append(Value.ToString("X"));
             return sb.ToString();
         }

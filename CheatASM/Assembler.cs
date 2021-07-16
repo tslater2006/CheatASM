@@ -242,11 +242,6 @@ namespace CheatASM
             return result;
         }
 
-        public AssemblyResult AssembleInstruction(string instr)
-        {
-            return AssembleString(instr);
-        }
-
         public string AssembleSingleInstruction(string instr)
         {
             var result = AssembleString(instr);
@@ -292,42 +287,34 @@ namespace CheatASM
                 }
                 if (variable != null)
                 {
-                    if (variable.Const == true)
+
+                    /* found a variable */
+                    if (cheat.VariableReg.ContainsKey(variable))
                     {
-                        /* variable is a constant, but used as a register... bad */
-                        throw new AssemblerException("Variable: " + variableName + " is declared as a constant, but used like a register.");
+                        return cheat.VariableReg[variable];
                     }
                     else
                     {
-                        /* found a variable */
-                        if (cheat.VariableReg.ContainsKey(variable))
+                        /* variable isn't in the map for this cheat yet... we need to add it */
+
+                        /* find a register that isn't in use yet... */
+                        var availableReg = RegisterList.Where(r => cheat.VariableReg.ContainsValue(r) == false).LastOrDefault();
+                        if (String.IsNullOrEmpty(availableReg))
                         {
-                            return cheat.VariableReg[variable];
+                            throw new AssemblerException("Unable to find an unused variable for variable: " + variable.Name + ".");
                         }
                         else
                         {
-                            /* variable isn't in the map for this cheat yet... we need to add it */
+                            /* add this variable to the map */
+                            cheat.VariableReg.Add(variable, availableReg);
 
-                            /* find a register that isn't in use yet... */
-                            var availableReg = RegisterList.Where(r => cheat.VariableReg.ContainsValue(r) == false).LastOrDefault();
-                            if (String.IsNullOrEmpty(availableReg))
-                            {
-                                throw new AssemblerException("Unable to find an unused variable for variable: " + variable.Name + ".");
-                            }
-                            else
-                            {
-                                /* add this variable to the map */
-                                cheat.VariableReg.Add(variable, availableReg);
+                            /* create the variable init opcode */
+                            var loadReg = new Opcode4LoadRegWithStatic();
+                            loadReg.RegisterIndex = Convert.ToUInt32(availableReg.Substring(1), 16);
+                            loadReg.Value = Convert.ToUInt64(ConvertVariableValue(variable), 16);
 
-                                /* create the variable init opcode */
-                                var loadReg = new Opcode4LoadRegWithStatic();
-                                loadReg.RegisterIndex = Convert.ToUInt32(availableReg.Substring(1), 16);
-                                loadReg.Value = Convert.ToUInt64(ConvertVariableValue(variable),16);
-
-                                cheat.VarInitCodes.Add(loadReg);
-                                return availableReg;
-                            }
-
+                            cheat.VarInitCodes.Add(loadReg);
+                            return availableReg;
                         }
 
                     }

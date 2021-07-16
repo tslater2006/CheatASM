@@ -815,13 +815,6 @@ namespace CheatASM
                     opTyped.OtherRegister = Convert.ToUInt16(ParseAnyRef(opCtx.value, AnyRefType.REGISTER, cheat).Substring(1), 16);
                     opTyped.OperandType = 5;
                 }
-
-
-                
-            }
-            else
-            {
-                throw new NotSupportedException();
             }
             cheat.Opcodes.Add(opTyped);
         }

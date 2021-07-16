@@ -271,44 +271,6 @@ namespace CheatASM
             throw new AssemblerException("Failed to parse Any Ref");
         }
 
-        private AnyRefType GetRefType(RegRefContext regRef, Cheat cheat)
-        {
-            if (Variables.ContainsKey(regRef.reg.Text))
-            {
-                var definedVar = Variables[regRef.reg.Text];
-                if (definedVar.Const)
-                {
-                    return AnyRefType.NUMBER;
-                } else
-                {
-                    return AnyRefType.REGISTER;
-                }
-            }
-            else
-            {
-                return AnyRefType.REGISTER;
-            }
-        }
-
-        private AnyRefType GetRefType(NumRefContext numRef, Cheat cheat)
-        {
-            if (Variables.ContainsKey(numRef.num.Text))
-            {
-                var definedVar = Variables[numRef.num.Text];
-                if (definedVar.Const)
-                {
-                    return AnyRefType.NUMBER;
-                }
-                else
-                {
-                    return AnyRefType.REGISTER;
-                }
-            }
-            else
-            {
-                return AnyRefType.NUMBER;
-            }
-        }
 
         private string ParseRegRef(RegRefContext regRef, Cheat cheat)
         {

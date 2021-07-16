@@ -149,6 +149,7 @@ namespace CheatASM
                     blocks[1] = (uint)(RelativeAddress & 0xFFFFFFFF);
                     break;
                 case 3:
+                    SetNibble(ref blocks[0], 4, (uint)OffsetRegister);
                     SetNibble(ref blocks[0], 7, (uint)MemType & 0xF);
                     SetNibble(ref blocks[0], 8, 0);
                     break;
@@ -158,6 +159,7 @@ namespace CheatASM
                     blocks[1] = (uint)(RelativeAddress & 0xFFFFFFFF);
                     break;
                 case 5:
+                    SetNibble(ref blocks[0], 4, (uint)OffsetRegister);
                     SetNibble(ref blocks[0], 7, (uint)MemType & 0xF);
                     SetNibble(ref blocks[0], 8, (uint)(RelativeAddress >> 32) & 0xF);
                     blocks[1] = (uint)(RelativeAddress & 0xFFFFFFFF);

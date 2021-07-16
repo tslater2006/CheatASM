@@ -37,15 +37,6 @@ namespace CheatASM
 
         public override string ToByteString()
         {
-            switch(MathType)
-            {
-                case RegisterArithmeticType.and:
-                case RegisterArithmeticType.or:
-                case RegisterArithmeticType.not:
-                case RegisterArithmeticType.xor:
-                case RegisterArithmeticType.copy:
-                    return "# Math function '" + Enum.GetName(typeof(RegisterArithmeticType), MathType) + "' not supported by in this form. (Use opcode 0x9 form)";
-            }
             /* 7T0RC000 VVVVVVVV */
             uint[] blocks = new uint[2];
             SetNibble(ref blocks[0], 1, 7);

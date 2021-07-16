@@ -537,21 +537,21 @@ namespace CheatASM
             {
                 opTyped.MemType = Enum.Parse<MemoryAccessType>(opCtx.memType.Text);
                 /* has to be OffsetType 3,4,5 */
-                bool hasReg = opCtx.@base != null;
+                bool hasReg = opCtx.regOffset != null;
                 bool hasVal = opCtx.numOffset != null;
 
                 if (hasReg && hasVal)
                 {
                     /* type 5 */
                     opTyped.OffsetType = 5;
-                    opTyped.OffsetRegister = Convert.ToUInt16(ParseRegRef(opCtx.@base, cheat).Substring(1), 16);
+                    opTyped.OffsetRegister = Convert.ToUInt16(ParseRegRef(opCtx.regOffset, cheat).Substring(1), 16);
                     opTyped.RelativeAddress = Convert.ToUInt64(ParseNumRef(opCtx.numOffset), 16);
                 }
                 else if (hasReg)
                 {
                     /* type 3 */
                     opTyped.OffsetType = 3;
-                    opTyped.OffsetRegister = Convert.ToUInt16(ParseRegRef(opCtx.@base, cheat).Substring(1), 16);
+                    opTyped.OffsetRegister = Convert.ToUInt16(ParseRegRef(opCtx.regOffset, cheat).Substring(1), 16);
                 }
                 else if (hasVal)
                 {
@@ -566,7 +566,7 @@ namespace CheatASM
                 if (opCtx.regOffset != null)
                 {
                     opTyped.OffsetType = 1;
-                    opTyped.OffsetRegister = Convert.ToUInt16(ParseRegRef(opCtx.regOffset, cheat));
+                    opTyped.OffsetRegister = Convert.ToUInt16(ParseRegRef(opCtx.regOffset, cheat).Substring(1), 16);
                 } else if (opCtx.numOffset != null)
                 {
                     opTyped.OffsetType = 2;

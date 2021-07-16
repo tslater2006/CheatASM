@@ -784,9 +784,15 @@ namespace CheatASM
             else if (opCtx.addrReg != null)
             {
                 /* operand type is either 2 or 3 */
-                if (GetAnyRefType(opCtx.offset) == AnyRefType.NUMBER)
+                if (opCtx.offset == null || GetAnyRefType(opCtx.offset) == AnyRefType.NUMBER)
                 {
-                    opTyped.RelativeAddress = Convert.ToUInt64(ParseAnyRef(opCtx.offset, AnyRefType.NUMBER, cheat), 16);
+                    if (opCtx.offset != null)
+                    {
+                        opTyped.RelativeAddress = Convert.ToUInt64(ParseAnyRef(opCtx.offset, AnyRefType.NUMBER, cheat), 16);
+                    } else
+                    {
+                        opTyped.RelativeAddress = 0;
+                    }
                     opTyped.OperandType = 2;
                 }
                 else if (GetAnyRefType(opCtx.offset) == AnyRefType.REGISTER)

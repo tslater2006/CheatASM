@@ -810,7 +810,7 @@ namespace CheatASM
                     CheckValueFitsBitWidth(opTyped.BitWidth, opTyped.Value);
                     opTyped.OperandType = 4;
                 }
-                else if (GetAnyRefType(opCtx.offset) == AnyRefType.REGISTER)
+                else if (GetAnyRefType(opCtx.value) == AnyRefType.REGISTER)
                 {
                     opTyped.OtherRegister = Convert.ToUInt16(ParseAnyRef(opCtx.value, AnyRefType.REGISTER, cheat).Substring(1), 16);
                     opTyped.OperandType = 5;

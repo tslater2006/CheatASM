@@ -253,8 +253,208 @@ namespace Tests
             foreach (var kvp in instructions)
             {
                 var assembledInstruction = asm.AssembleSingleInstruction(kvp.Key);
-                Console.WriteLine(assembledInstruction);
-                //Assert.AreEqual(assembledInstruction, kvp.Value, $"Assembly of '{kvp.Key}' gave '{assembledInstruction}' instead of '{kvp.Value}'");
+                Assert.AreEqual(assembledInstruction, kvp.Value, $"Assembly of '{kvp.Key}' gave '{assembledInstruction}' instead of '{kvp.Value}'");
+            }
+
+
+        }
+
+        [Test]
+        public void TestOpcodeA()
+        {
+            /* 
+               MOVE DOT (bitWidth=BIT_WIDTH) LSQUARE (base=regRef) (PLUS_SIGN (regOffset=regRef))? RSQUARE COMMA (regValue=regRef) (increment=INCREMENT)? #opCodeA
+               MOVE DOT (bitWidth=BIT_WIDTH) LSQUARE (base=regRef) (PLUS_SIGN (numOffset=numRef))? RSQUARE COMMA (regValue=regRef) (increment=INCREMENT)? #opCodeA
+               MOVE DOT (bitWidth=BIT_WIDTH) LSQUARE (memType=MEM_TYPE) (PLUS_SIGN (regOffset=regRef))? (PLUS_SIGN (numOffset=numRef))? RSQUARE COMMA (regValue=regRef) #opCodeA;
+            */
+            Dictionary<string, string> instructions = new()
+            {
+                { "mov.d [R0], R1", "A4100000" },
+                { "mov.d [R9], R2 inc", "A4291000" },
+                { "mov.d [RA+ R1], R3", "A43A0110" },
+                { "mov.d [RB + R1], R4 inc", "A44B1110" },
+                { "mov.d [RC + 0x123], R5", "A45C0200 00000123" },
+                { "mov.d [RD + 0x123], R6 inc", "A46D1200 00000123" },
+                { "mov.d [MAIN + RE], R7 inc", "A47E0300" },
+                { "mov.d [MAIN + 0x123], R7 inc", "A4700400 00000123" },
+                { "mov.d [HEAP + RF + 0x123456789], R8 inc", "A48F0511 23456789" }
+            };
+
+            foreach (var kvp in instructions)
+            {
+                var assembledInstruction = asm.AssembleSingleInstruction(kvp.Key);
+                Assert.AreEqual(assembledInstruction, kvp.Value, $"Assembly of '{kvp.Key}' gave '{assembledInstruction}' instead of '{kvp.Value}'");
+            }
+
+        }
+
+        [Test]
+        public void TestOpcodeC0()
+        {
+            /* 
+               (cond=CONDITIONAL) DOT (bitWidth=BIT_WIDTH) (source=regRef) COMMA LSQUARE (memType=MEM_TYPE) PLUS_SIGN (offset=anyRef) RSQUARE
+		       (cond=CONDITIONAL) DOT (bitWidth=BIT_WIDTH) (source=regRef) COMMA LSQUARE (addrReg=regRef) (PLUS_SIGN (offset=anyRef))? RSQUARE
+		       (cond=CONDITIONAL) DOT (bitWidth=BIT_WIDTH) (source=regRef) COMMA (value=anyRef); 
+            */
+
+            Dictionary<string, string> instructions = new()
+            {
+                { ".b R0, R1", "C01_0510" },
+                { ".w R0, 0x123", "C02_0400 00000123" },
+                { ".d R0, [R1]", "C04_0200 00000000" },
+                { ".q R0, [R1 + 0x123]", "C08_0200 00000123" },
+                { ".b R0, [R1 + R2]", "C01_0302" },
+                { ".w R0, [MAIN + 0x123]", "C02_0000 00000123" },
+                { ".d R0, [HEAP + 0x123]", "C04_0010 00000123" },
+                { ".q R0, [MAIN]", "C08_0000 00000000" },
+                { ".b R0, [MAIN + R0]", "C01_0100" },
+
+            };
+            string[] comparisons = new string[] { "gt", "ge", "lt", "le", "eq", "ne" };
+            foreach (var kvp in instructions)
+            {
+                foreach (var comp in comparisons)
+                {
+                    var testInstruction = kvp.Key;
+                    var testAnswer = kvp.Value;
+                    testInstruction = $"{comp}{testInstruction}";
+                    testAnswer = testAnswer.Replace('_', ((uint)(Enum.Parse(typeof(ConditionalComparisonType), comp))).ToString()[0]);
+
+                    var assembledInstruction = asm.AssembleSingleInstruction(testInstruction);
+                    Assert.AreEqual(assembledInstruction, testAnswer, $"Assembly of '{kvp.Key}' gave '{assembledInstruction}' instead of '{kvp.Value}'");
+                }
+            }
+        }
+
+        [Test]
+        public void TestOpcodeC1()
+        {
+            /* 
+             (func=SAVE) DOT (type=REG) (index=numRef) COMMA (reg=regRef)
+        | (func=LOAD) DOT (type=REG) (reg=regRef) COMMA (index=numRef) 
+              | (func=CLEAR) DOT (type=REG) (reg=regRef)
+        | (func=CLEAR) DOT (type=SAVED) (index=numRef)
+             */
+
+            Dictionary<string, string> instructions = new()
+            {
+                { "save.reg 0x1, R3", "C1010310" },
+                { "load.reg R3, 0x1", "C1030100" },
+                { "clear.reg R3", "C1030030" },
+                { "clear.saved 0x1", "C1010020" },
+            };
+
+            foreach (var kvp in instructions)
+            {
+                var assembledInstruction = asm.AssembleSingleInstruction(kvp.Key);
+                Assert.AreEqual(assembledInstruction, kvp.Value, $"Assembly of '{kvp.Key}' gave '{assembledInstruction}' instead of '{kvp.Value}'");
+            }
+
+
+
+        }
+
+        [Test]
+        public void TestOpcodeC2()
+        {
+            /* 
+             (func=SAVE) DOT (type=REG) (index=numRef) COMMA (reg=regRef)
+        | (func=LOAD) DOT (type=REG) (reg=regRef) COMMA (index=numRef) 
+              | (func=CLEAR) DOT (type=REG) (reg=regRef)
+        | (func=CLEAR) DOT (type=SAVED) (index=numRef)
+             */
+
+            Dictionary<string, string> instructions = new()
+            {
+                { "save.regs R1", "C2100002" },
+                { "save.regs R1,R2", "C2100006" },
+                { "save.regs R0, R1,R2,R3,R4,R5,R6,R7,R8,R9,RA,RB,RC,RD,RE,RF", "C210FFFF" },
+
+                { "load.regs R1", "C2000002" },
+                { "load.regs R1,R2", "C2000006" },
+                { "load.regs R0,R1,R2,R3,R4,R5,R6,R7,R8,R9,RA,RB,RC,RD,RE,RF", "C200FFFF" },
+
+                { "clear.regs R1", "C2300002" },
+                { "clear.regs R1,R2", "C2300006" },
+                { "clear.regs R0,R1,R2,R3,R4,R5,R6,R7,R8,R9,RA,RB,RC,RD,RE,RF", "C230FFFF" },
+
+                
+                { "clear.saved 0x1,0x2,0x3,0x4", "C220001E" },
+            };
+
+            foreach (var kvp in instructions)
+            {
+                var assembledInstruction = asm.AssembleSingleInstruction(kvp.Key);
+                Assert.AreEqual(assembledInstruction, kvp.Value, $"Assembly of '{kvp.Key}' gave '{assembledInstruction}' instead of '{kvp.Value}'");
+            }
+
+
+
+        }
+
+        [Test]
+        public void TestOpcodeC3()
+        {
+            /* 
+              (func=SAVE) DOT (type=STATIC) (sreg=SREGISTER) COMMA (reg=regRef)
+              (func=LOAD) DOT (type=STATIC) (reg=regRef) COMMA (sreg=SREGISTER);
+            */
+
+            Dictionary<string, string> instructions = new()
+            {
+                { "save.static SR1, R0", "C3000810" },
+                { "load.static R0, SR7", "C3000070" },
+                { "save.static SR7F, R1", "C3000FF1" },
+                { "load.static R6, SR7F", "C30007F6" },
+
+            };
+
+            foreach (var kvp in instructions)
+            {
+                var assembledInstruction = asm.AssembleSingleInstruction(kvp.Key);
+                Assert.AreEqual(assembledInstruction, kvp.Value, $"Assembly of '{kvp.Key}' gave '{assembledInstruction}' instead of '{kvp.Value}'");
+            }
+        }
+
+        [Test]
+        public void TestOpcodeFF0()
+        {
+            /* opCodeFF0: (func=PAUSE); */
+            Assert.AreEqual(asm.AssembleSingleInstruction("pause"), "FF000000");
+        }
+
+        [Test]
+        public void TestOpcodeFF1()
+        {
+            /* opCodeFF1: (func=RESUME); */
+            Assert.AreEqual(asm.AssembleSingleInstruction("resume"), "FF100000");
+        }
+
+        [Test]
+        public void TestOpcodeFFF()
+        {
+            /* 
+               opCodeFFF: (func=LOG) DOT (bitWidth=BIT_WIDTH) (id=HEX_NUMBER) COMMA LSQUARE (memType=MEM_TYPE) (PLUS_SIGN (offset=anyRef))? RSQUARE
+               (func=LOG) DOT (bitWidth=BIT_WIDTH) (id=HEX_NUMBER) COMMA LSQUARE (addrReg=regRef) (PLUS_SIGN (offset=anyRef))? RSQUARE
+               (func=LOG) DOT (bitWidth=BIT_WIDTH) (id=HEX_NUMBER) COMMA (value=regRef);
+            */
+
+            Dictionary<string, string> instructions = new()
+            {
+                { "log.b 0x1, [MAIN]", "FFF11000 00000000" },
+                { "log.w 0x1, [MAIN + 0x123]", "FFF21000 00000123" },
+                { "log.d 0x1, [MAIN + R3]", "FFF41103" },
+                { "log.q 0x1, [HEAP + 0x123]", "FFF81010 00000123" },
+                { "log.b 0x1, [R2]", "FFF11220 00000000" },
+                { "log.b 0x1, [R2 + R3]", "FFF11323" },
+                { "log.w 0x1, [R4 + 0x123]", "FFF21240 00000123" },
+                { "log.d 0x1, R7", "FFF41470" },
+            };
+
+            foreach (var kvp in instructions)
+            {
+                var assembledInstruction = asm.AssembleSingleInstruction(kvp.Key);
+                Assert.AreEqual(assembledInstruction, kvp.Value, $"Assembly of '{kvp.Key}' gave '{assembledInstruction}' instead of '{kvp.Value}'");
             }
 
 

@@ -720,17 +720,26 @@ namespace CheatASM
                 }
             } else if (opCtx.addrReg != null)
             {
-                var refType = GetAnyRefType(opCtx.offset);
-                switch (refType)
+                op.AddressRegister = Convert.ToUInt32(ParseRegRef(opCtx.addrReg, cheat).Substring(1), 16);
+                if (opCtx.offset == null)
                 {
-                    case AnyRefType.NUMBER:
-                        op.OperandType = 2;
-                        op.RelativeAddress = Convert.ToUInt64(ParseAnyRef(opCtx.offset, AnyRefType.NUMBER, cheat), 16);
-                        break;
-                    case AnyRefType.REGISTER:
-                        op.OperandType = 3;
-                        op.OffsetRegister = Convert.ToUInt32(ParseAnyRef(opCtx.offset, AnyRefType.REGISTER, cheat).Substring(1), 16);
-                        break;
+                    op.OperandType = 2;
+                    op.RelativeAddress = 0;
+                }
+                else
+                {
+                    var refType = GetAnyRefType(opCtx.offset);
+                    switch (refType)
+                    {
+                        case AnyRefType.NUMBER:
+                            op.OperandType = 2;
+                            op.RelativeAddress = Convert.ToUInt64(ParseAnyRef(opCtx.offset, AnyRefType.NUMBER, cheat), 16);
+                            break;
+                        case AnyRefType.REGISTER:
+                            op.OperandType = 3;
+                            op.OffsetRegister = Convert.ToUInt32(ParseAnyRef(opCtx.offset, AnyRefType.REGISTER, cheat).Substring(1), 16);
+                            break;
+                    }
                 }
             } else
             {

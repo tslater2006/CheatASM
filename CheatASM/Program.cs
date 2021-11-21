@@ -88,9 +88,6 @@ namespace CheatASM
             optSet.Add("repl", "REPL mode", option => repl = option != null);
             optSet.Parse(args);
 
-            Assembler asm = new Assembler();
-            var x = asm.AssembleFile(@"C:\Users\tslat\source\repos\CheatASM\CheatASM\examples\variables.asm");
-
             if (repl)
             {
                 RunREPL();
@@ -146,7 +143,7 @@ namespace CheatASM
 
             /* at this point we know the inputPath exists, and if its a folder or not */
 
-            asm = new Assembler();
+            Assembler asm = new Assembler();
             Disassembler disasm = new Disassembler();
 
             if (isInputDir)

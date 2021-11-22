@@ -360,6 +360,8 @@ log.d 0x1, R7
 
 CheatASM currently supports If/Else has a higher level mnemonic, this assembles into the proper "conditional" and "end conditional" opcodes.
 
+Supported conditional operators are `>, >=, <, <=, ==, !=`
+
 Example:
 
 ```

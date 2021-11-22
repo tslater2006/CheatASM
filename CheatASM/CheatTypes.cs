@@ -35,6 +35,8 @@ namespace CheatASM
     {
         MAIN = 0,
         HEAP = 1,
+        ALIAS = 2,
+        ASLR = 3
     };
 
     public enum ConditionalComparisonType : uint
@@ -101,6 +103,10 @@ namespace CheatASM
 
     public abstract class CheatOpcode
     {
+        public CheatOpcode Clone()
+        {
+            return (CheatOpcode)this.MemberwiseClone();
+        }
         protected static uint GetNibble(UInt32 block, uint index)
         {
             return (block >> (int)(32 - (index * 4))) & 0xF;

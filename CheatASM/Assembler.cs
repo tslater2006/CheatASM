@@ -53,11 +53,11 @@ namespace CheatASM
             {
                 sb.Append("{").Append(masterCode.Name).Append("}\r\n");
 
-	    	foreach (var opcode in masterCode.VarInitCodes)
+                foreach (var opcode in masterCode.VarInitCodes)
                 {
                     sb.AppendLine(opcode.ToByteString());
                 }
-		    
+
                 foreach (var opcode in masterCode.Opcodes)
                 {
                     sb.AppendLine(opcode.ToByteString());
@@ -101,6 +101,27 @@ namespace CheatASM
         string parsingContent = null;
         string errorMsg;
         int errorPos;
+        static Dictionary<string, ConditionalComparisonType> CompareOperatorMap = new Dictionary<string, ConditionalComparisonType>()
+        {
+            {"<",ConditionalComparisonType.lt },
+            {"<=",ConditionalComparisonType.le },
+            {">",ConditionalComparisonType.gt },
+            {">=",ConditionalComparisonType.ge },
+            {"==",ConditionalComparisonType.eq },
+            {"!=",ConditionalComparisonType.ne },
+        };
+
+        static Dictionary<string, ConditionalComparisonType> InvertedCompareOperatorMap = new Dictionary<string, ConditionalComparisonType>()
+        {
+            {"<",ConditionalComparisonType.ge },
+            {"<=",ConditionalComparisonType.gt },
+            {">",ConditionalComparisonType.le },
+            {">=",ConditionalComparisonType.lt },
+            {"==",ConditionalComparisonType.ne },
+            {"!=",ConditionalComparisonType.eq },
+        };
+
+
         public override void SyntaxError([NotNull] IRecognizer recognizer, [Nullable] IToken offendingSymbol, int line, int charPositionInLine, [NotNull] string msg, [Nullable] RecognitionException e)
         {
             base.SyntaxError(recognizer, offendingSymbol, line, charPositionInLine, msg, e);
@@ -220,7 +241,7 @@ namespace CheatASM
                         cheat.IsMaster = true;
                     }
 
-                    var statements = entry.statement();
+                    var statements = entry.statementList().statement();
                     foreach (var stmt in statements)
                     {
                         AssembleStatement(stmt, cheat);
@@ -229,11 +250,11 @@ namespace CheatASM
                 }
 
             }
-            else if (prog.statement() != null && prog.statement().Length > 0)
+            else if (prog.statementList().statement() != null && prog.statementList().statement().Length > 0)
             {
                 var cheat = new Cheat();
                 cheat.Name = "Untitled";
-                foreach (var stmt in prog.statement())
+                foreach (var stmt in prog.statementList().statement())
                 {
                     AssembleStatement(stmt, cheat);
                 }
@@ -944,7 +965,9 @@ namespace CheatASM
 
         private void AssembleOpCode2(OpCode2Context opCtx, Cheat cheat)
         {
-            cheat.Opcodes.Add(new Opcode2EndConditional());
+            var endCond = new Opcode2EndConditional();
+            endCond.IsElse = (opCtx.ELSE() != null);
+            cheat.Opcodes.Add(endCond);
         }
 
         private void AssembleOpCode1(OpCode1Context opCtx, Cheat cheat)
@@ -1062,9 +1085,146 @@ namespace CheatASM
                 case OpCodeFFFContext op:
                     AssembleOpCodeFFF(op, cheat);
                     break;
+                case IfStatementContext op:
+                    AssembleIfStatement(op, cheat);
+                    break;
             }
         }
 
-        
+        private void AssembleIfStatement(IfStatementContext opCtx, Cheat cheat)
+        {
+            var compareBitWidth = Enum.Parse<BitWidthType>(opCtx.bitWidth.Text, true);
+            bool containsElse = opCtx.IF_ELSE() != null;
+
+            IfStatementType ifType;
+
+            if (opCtx.leftMemType != null)
+            {
+                ifType = IfStatementType.CODE1;
+            } else
+            {
+                if (opCtx.memType != null)
+                {
+                    ifType = IfStatementType.CODEC0MEM;
+                } else
+                {
+                    if (opCtx.addrReg != null)
+                    {
+                        ifType = IfStatementType.CODEC0REG;
+                    } else
+                    {
+                        ifType = IfStatementType.CODEC0VAL;
+                    }
+                }
+            }
+
+            CheatOpcode conditionalOp = null;
+            CheatOpcode elseCondition = new Opcode2EndConditional() { IsElse = true };
+            if (ifType == IfStatementType.CODE1)
+            {
+                conditionalOp = new Opcode1Conditional();
+                var typed = (Opcode1Conditional)conditionalOp;
+                typed.BitWidth = compareBitWidth;
+                typed.MemType = Enum.Parse<MemoryAccessType>(opCtx.leftMemType.Text);
+                typed.Immediate = Convert.ToUInt64(ParseNumRef(opCtx.numOffset), 16);
+                typed.Value = Convert.ToUInt64(ParseNumRef(opCtx.value), 16);
+                typed.Condition = CompareOperatorMap[opCtx.CONDITIONAL_SYMBOL().ToString()];
+            }
+            else
+            {
+                /* we'll be using C0 for the conditional check */
+                conditionalOp = new OpcodeC0RegisterConditional();
+                var typed = (OpcodeC0RegisterConditional)conditionalOp;
+                typed.BitWidth = compareBitWidth;
+                typed.Condition = CompareOperatorMap[opCtx.CONDITIONAL_SYMBOL().ToString()];
+                typed.SourceRegister = Convert.ToUInt16(ParseRegRef(opCtx.reg, cheat).Substring(1), 16);
+                if (ifType == IfStatementType.CODEC0VAL)
+                {
+                    /* operand type is either 2 or 3 */
+                    if (GetAnyRefType(opCtx.rightAny) == AnyRefType.NUMBER)
+                    {
+                        typed.Value = Convert.ToUInt64(ParseAnyRef(opCtx.rightAny, AnyRefType.NUMBER, cheat), 16);
+                        CheckValueFitsBitWidth(typed.BitWidth, typed.Value);
+                        typed.OperandType = 4;
+                    }
+                    else if (GetAnyRefType(opCtx.rightAny) == AnyRefType.REGISTER)
+                    {
+                        typed.OtherRegister = Convert.ToUInt16(ParseAnyRef(opCtx.rightAny, AnyRefType.REGISTER, cheat).Substring(1), 16);
+                        typed.OperandType = 5;
+                    }
+                }
+                else if (ifType == IfStatementType.CODEC0REG)
+                {
+                    typed.AddressRegister = Convert.ToUInt32(ParseRegRef(opCtx.addrReg, cheat).Substring(1), 16);
+                    /* operand type is either 2 or 3 */
+                    if (opCtx.anyOffset == null || GetAnyRefType(opCtx.anyOffset) == AnyRefType.NUMBER)
+                    {
+                        if (opCtx.anyOffset != null)
+                        {
+                            typed.RelativeAddress = Convert.ToUInt64(ParseAnyRef(opCtx.anyOffset, AnyRefType.NUMBER, cheat), 16);
+                        }
+                        else
+                        {
+                            typed.RelativeAddress = 0;
+                        }
+                        typed.OperandType = 2;
+                    }
+                    else if (GetAnyRefType(opCtx.anyOffset) == AnyRefType.REGISTER)
+                    {
+                        typed.OffsetRegister = Convert.ToUInt16(ParseAnyRef(opCtx.anyOffset, AnyRefType.REGISTER, cheat).Substring(1), 16);
+                        typed.OperandType = 3;
+                    }
+                } else if (ifType == IfStatementType.CODEC0MEM)
+                {
+                    typed.MemType = Enum.Parse<MemoryAccessType>(opCtx.memType.Text, true);
+
+                    /* operand type is either 0 or 1... */
+                    if (opCtx.anyOffset == null || GetAnyRefType(opCtx.anyOffset) == AnyRefType.NUMBER)
+                    {
+                        if (opCtx.anyOffset != null)
+                        {
+                            typed.RelativeAddress = Convert.ToUInt64(ParseAnyRef(opCtx.anyOffset, AnyRefType.NUMBER, cheat), 16);
+                        }
+                        else
+                        {
+                            typed.RelativeAddress = 0;
+                        }
+                        typed.OperandType = 0;
+                    }
+                    else if (GetAnyRefType(opCtx.anyOffset) == AnyRefType.REGISTER)
+                    {
+                        typed.OffsetRegister = Convert.ToUInt16(ParseAnyRef(opCtx.anyOffset, AnyRefType.REGISTER, cheat).Substring(1), 16);
+                        typed.OperandType = 1;
+                    }
+                }
+            }
+
+            cheat.Opcodes.Add(conditionalOp);
+
+            foreach(var stmt in opCtx.stmtList.statement())
+            {
+                AssembleStatement(stmt, cheat);
+            }
+
+            if (containsElse)
+            {
+                cheat.Opcodes.Add(elseCondition);
+                foreach (var stmt in opCtx.elseStmtList.statement())
+                {
+                    AssembleStatement(stmt, cheat);
+                }
+            }
+
+            cheat.Opcodes.Add(new Opcode2EndConditional());
+
+        }
+    }
+
+
+
+
+    enum IfStatementType
+    {
+        CODE1, CODEC0MEM, CODEC0REG, CODEC0VAL
     }
 }

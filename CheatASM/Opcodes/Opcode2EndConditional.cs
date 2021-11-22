@@ -6,18 +6,36 @@ namespace CheatASM
 {
     public class Opcode2EndConditional : CheatOpcode
     {
+        public bool IsElse = false;
         public Opcode2EndConditional() { }
 
-        public Opcode2EndConditional(uint[] blocks) { }
+        public Opcode2EndConditional(uint[] blocks)
+        {
+            IsElse = ((blocks[0]>> 24) & 0xF) == 0x1;
+        }
 
         public override string ToASM()
         {
-            return "endcond";
+            if (IsElse)
+            {
+                return "else";
+            } else
+            {
+                return "endcond";
+            }
+            
         }
 
         public override string ToByteString()
         {
-            return "20000000";
+            if (IsElse)
+            {
+                return "21000000";
+            }
+            else
+            {
+                return "20000000";
+            }
         }
     }
 }

@@ -23,6 +23,17 @@ namespace CheatASM
             sb.Append(indent);
             sb.Append(op.ToASM());
         }
+
+        public string DisassembleString(string contents)
+        {
+            StringBuilder sb = new StringBuilder();
+            foreach(var line in contents.Split('\n',StringSplitOptions.RemoveEmptyEntries))
+            {
+                sb.AppendLine(DisassembleLine(line));
+            }
+
+            return sb.ToString();
+        }
         public string DisassembleLine(string line)
         {
             /* trim the line... */
@@ -52,6 +63,10 @@ namespace CheatASM
                             conditionalIndent--;
                         }
                         WriteOpcode(op, sb);
+                        if (((Opcode2EndConditional)op).IsElse)
+                        {
+                            conditionalIndent++;
+                        }
                         break;
                     case '3':
                         op = new Opcode3Loop(blocks);

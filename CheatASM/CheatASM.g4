@@ -1,7 +1,7 @@
 ﻿grammar CheatASM;
 
 program: gameInfo? titleID? buildID? variableDecl* cheatEntry+
-       | variableDecl* statement+;
+       | variableDecl* statementList;
 
 statement: opCode1
          | opCode2
@@ -16,9 +16,12 @@ statement: opCode1
 		 | opCodeFF0
 		 | opCodeFF1
 		 | opCodeFFF
+		 | ifStatement
 		 | COMMENT_LINE;
 
-cheatEntry: (header=cheatHeader) statement+;
+statementList: (stmt=statement+);
+
+cheatEntry: (header=cheatHeader) statementList;
 
 titleID: DOT 'title'  (title=ID);
 buildID: DOT 'build'  (build=ID);
@@ -28,7 +31,8 @@ cheatHeader: DOT 'cheat'  (master=MASTER)? (name=CHEAT_NAME);
 
 /* cond.d [HEAP + num], num */
 opCode1: (cond=CONDITIONAL) DOT (bitWidth=BIT_WIDTH) LSQUARE(memType=MEM_TYPE)PLUS_SIGN(offset=numRef)RSQUARE COMMA (value=numRef);
-opCode2: END_COND;
+opCode2: END_COND
+       | ELSE;
 opCode3: LOOP (register=regRef) COMMA(value=numRef)
        | (endloop=END_LOOP) (register=regRef);
 
@@ -86,12 +90,20 @@ variableDecl:  (name=VARIABLE_NAME) COLON (type=VARIABLE_TYPE) (const=CONST)? (v
 regList: (reg=regRef) (COMMA regRef)*;
 indexList: (index=numRef) (COMMA numRef)*;
 
+ifStatement: IF DOT (bitWidth=BIT_WIDTH) (reg=regRef) (cond=CONDITIONAL_SYMBOL) (rightAny=anyRef) (stmtList=statementList) (IF_ELSE (elseStmtList=statementList))? FI
+           | IF DOT (bitWidth=BIT_WIDTH) (reg=regRef) (cond=CONDITIONAL_SYMBOL) LSQUARE (memType=MEM_TYPE) (PLUS_SIGN (anyOffset=anyRef))? RSQUARE (stmtList=statementList) (IF_ELSE (elseStmtList=statementList))? FI
+           | IF DOT (bitWidth=BIT_WIDTH) (reg=regRef) (cond=CONDITIONAL_SYMBOL) LSQUARE (addrReg=regRef) (PLUS_SIGN (anyOffset=anyRef))? RSQUARE (stmtList=statementList) (IF_ELSE (elseStmtList=statementList))? FI
+           | IF DOT (bitWidth=BIT_WIDTH)  LSQUARE(leftMemType=MEM_TYPE)PLUS_SIGN(numOffset=numRef)RSQUARE CONDITIONAL_SYMBOL (value=numRef) (stmtList=statementList) (IF_ELSE (elseStmtList=statementList))? FI;
+
 // Lexer Rules
+
 MOVE: M O V;
 CONDITIONAL: GT | GE | LT | LE | EQ | NE;
+CONDITIONAL_SYMBOL: '>' | '>=' | '<' | '<=' | '==' | '!=';
 LOOP: L O O P;
 END_LOOP: E N D L O O P;
 KEYCHECK: K E Y C H E C K;
+ELSE: E L S E;
 END_COND: E N D C O N D;
 INCREMENT: I N C;
 SAVE: S A V E ;
@@ -115,10 +127,15 @@ RCURL: '}';
 PLUS_SIGN: '+';
 COMMA: ',';
 // memory types
+IF :DOT I F;
+FI : DOT F I;
+IF_ELSE: DOT E L S E;
 
-MEM_TYPE: MEMORY_HEAP | MEMORY_MAIN;
+MEM_TYPE: MEMORY_HEAP | MEMORY_MAIN | MEMORY_ALIAS | MEMORY_ASLR;
 MEMORY_MAIN: M A I N;
 MEMORY_HEAP: H E A P;
+MEMORY_ALIAS: A L I A S;
+MEMORY_ASLR: A S L R;
 
 BIT_WIDTH: BIT_BYTE | BIT_WORD | BIT_DOUBLE | BIT_QUAD;
 BIT_BYTE: B;

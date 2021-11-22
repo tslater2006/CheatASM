@@ -79,6 +79,7 @@ namespace CheatASMTests
         public void TestOpcode2()
         {
             Assert.AreEqual(asm.AssembleSingleInstruction("endcond"), "20000000");
+            Assert.AreEqual(asm.AssembleSingleInstruction("else"), "21000000");
         }
 
         [Test]
@@ -480,6 +481,44 @@ namespace CheatASMTests
 
             var assembledText = asm.AssembleString(programText).ToString();
 
+        }
+
+        [Test]
+        public void TestIfStatement()
+        {
+            var programText = @".if.b [MAIN + 0x123] == 0x3
+                                    mov r0, 0x3
+                                .else
+                                    mov r0, 0x1
+                                .fi
+                                .if.b R0 == 0x1
+                                    mov r0, 0x3
+                                .fi
+                                .if.b R0 == R2
+                                    mov r0, 0x3
+                                .fi
+                                .if.b R0 == [MAIN + 0x123]
+                                    mov r0, 0x3
+                                .fi
+                                .if.b R0 == [MAIN + R2]
+                                    mov r0, 0x3
+                                .fi
+                                .if.b R0 == [R2]
+                                    mov r0, 0x3
+                                .fi
+                                .if.b R0 == [R2 + R3]
+                                    mov r0, 0x3
+                                .fi
+                                .if.b R0 == [R2 + 0x123]
+                                    mov r0, 0x3
+                                .fi
+                                
+                                .if.b R0 == [MAIN]
+                                    mov r0, 0x3
+                                .fi";
+
+
+            var assembledText = asm.AssembleString(programText).ToString();
         }
     }
     

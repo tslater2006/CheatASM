@@ -28,29 +28,21 @@ namespace CheatASM
                     Disassembler disasm = new Disassembler();
                     Assembler asm = new Assembler();
                     /* process replLines */
+                    StringBuilder sb = new StringBuilder();
                     foreach (var l in replLines)
                     {
-                        if (l.Length == 0)
-                        {
-                            continue;
-                        }
-                        if (Regex.IsMatch(l, "^([0-9a-fA-F]{8}\\s?){1,4}$"))
-                        {
-                            Console.WriteLine(disasm.DisassembleLine(l));
-                        }
-                        else
-                        {
-                            if (l.Trim().StartsWith("["))
-                            {
-                                /* Cheat header probably? */
-                                Console.WriteLine(l);
-                            }
-                            else
-                            {
-                                Console.WriteLine(asm.AssembleString(l));
-                            }
-                        }
+                        sb.AppendLine(l);
                     }
+
+                    var fullText = sb.ToString();
+                    if (Regex.IsMatch(fullText, @"^[0-9a-fA-F\s\r\n]+$",RegexOptions.Singleline))
+                    {
+                        Console.WriteLine(disasm.DisassembleString(fullText));
+                    } else
+                    {
+                        Console.WriteLine(asm.AssembleString(fullText));
+                    }
+
                     replLines.Clear();
                 }
                 if (line.ToLower().Contains("quit"))
@@ -67,6 +59,24 @@ namespace CheatASM
 
         static void Main(string[] args)
         {
+            string[] resizableArray = new string[] { "a", "b", "c" };
+
+            Stack<string> myStack = new Stack<string>();
+            myStack.Push("a");
+            myStack.Push("b");
+            myStack.Push("c");
+            myStack.Pop();
+            myStack.Pop();
+            myStack.Pop();
+
+            Queue<string> myQueue = new Queue<string>();
+            myQueue.Enqueue("a");
+            myQueue.Enqueue("b");
+            myQueue.Enqueue("c");
+            myQueue.Dequeue();
+            myQueue.Dequeue();
+            myQueue.Dequeue();
+
             bool help = false;
             string inputPath = "";
             string outputPath = "";

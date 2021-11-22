@@ -67,6 +67,7 @@ namespace CheatASMTests
         public void TestOpcode2()
         {
             Assert.AreEqual(disasm.DisassembleLine("20000000"), "endcond");
+            Assert.AreEqual(disasm.DisassembleLine("21000000"), "else");
         }
 
         [Test]

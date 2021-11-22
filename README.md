@@ -1,6 +1,8 @@
 # CheatASM
 
-CheatASM is a utility to disassemble Atmosphere Cheat Codes into an assembly-like language for better reading/writing of them. Similarly it can reassemble the assembly-like language into the format supported by Atmosphere.
+CheatASM is a utility to designed to enable more readable cheatcode development for Atmosphere Cheat Codes. CheatASM provides an assembly-like syntax/language and compiles down into the proper cheatcode format used in the Atmosphere CFW. It can also act as a disassembler, converting cheatcodes back into a more readable syntax.
+
+The project is not under active development but as new cheat opcodes are added to Atmosphere, the assembly syntax will be updated to support them.
 
 ### Prerequisites
 
@@ -36,6 +38,8 @@ endcond
 Here are some useful examples of how to use this utility (please see -h for a full listing of command line arguments)
 
 CheatASM has 2 overall modes -d for disassembly and -a for assembly, you cannot specify both flags at the same time.
+
+Additionally CheatASM provides a REPL using the `--repl` flag in which you can test various things. the REPL accepts input until a blank line is sent, then it tries to determine if what was entered is an assembled code (and thus needs to be disassembled) or if it was assembly syntax (and thus needs to be assembled).
 
 #### Disassemble File to Standard Out
 If no -o flag is provided CheatASM will output the result to stdout.

@@ -356,7 +356,112 @@ log.w 0x1, [R4 + 0x123]
 log.d 0x1, R7
 ```
 
+## High Level Mnemonics
 
+CheatASM currently supports If/Else has a higher level mnemonic, this assembles into the proper "conditional" and "end conditional" opcodes.
+
+Example:
+
+```
+.if.b [MAIN + 0x123] == 0x3
+    mov r0, 0x3
+.else
+    mov r0, 0x1
+.fi
+.if.b R0 == 0x1
+    mov r0, 0x3
+.fi
+.if.b R0 == R2
+    mov r0, 0x3
+.fi
+.if.b R0 == [MAIN + 0x123]
+    mov r0, 0x3
+.fi
+.if.b R0 == [MAIN + R2]
+    mov r0, 0x3
+.fi
+.if.b R0 == [R2]
+    mov r0, 0x3
+.fi
+.if.b R0 == [R2 + R3]
+    mov r0, 0x3
+.fi
+.if.b R0 == [R2 + 0x123]
+    mov r0, 0x3
+.fi
+
+.if.b R0 == [MAIN]
+    mov r0, 0x3
+.fi
+```
+
+Assembles to:
+
+```
+11050000 00000123 00000003
+40000000 00000000 00000003
+21000000
+40000000 00000000 00000001
+20000000
+C0150400 00000001
+40000000 00000000 00000003
+20000000
+C0150520
+40000000 00000000 00000003
+20000000
+C0150000 00000123
+40000000 00000000 00000003
+20000000
+C0150102
+40000000 00000000 00000003
+20000000
+C0150220 00000000
+40000000 00000000 00000003
+20000000
+C0150323
+40000000 00000000 00000003
+20000000
+C0150220 00000123
+40000000 00000000 00000003
+20000000
+C0150000 00000000
+40000000 00000000 00000003
+20000000
+```
+
+Which disassembles to:
+
+```
+eq.b [MAIN + 0x123], 0x3
+  mov.q R0, 0x3
+else
+  mov.q R0, 0x1
+endcond
+eq.b R0, 0x1
+  mov.q R0, 0x3
+endcond
+eq.b R0, R2
+  mov.q R0, 0x3
+endcond
+eq.b R0, [MAIN + 0x123]
+  mov.q R0, 0x3
+endcond
+eq.b R0, [MAIN + R2]
+  mov.q R0, 0x3
+endcond
+eq.b R0, [R2]
+  mov.q R0, 0x3
+endcond
+eq.b R0, [R2 + R3]
+  mov.q R0, 0x3
+endcond
+eq.b R0, [R2 + 0x123]
+  mov.q R0, 0x3
+endcond
+eq.b R0, [MAIN]
+  mov.q R0, 0x3
+endcond
+```
 
 ## Building From Source
 

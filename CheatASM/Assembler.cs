@@ -52,6 +52,12 @@ namespace CheatASM
             if (masterCode != null)
             {
                 sb.Append("{").Append(masterCode.Name).Append("}\r\n");
+
+	    	foreach (var opcode in masterCode.VarInitCodes)
+                {
+                    sb.AppendLine(opcode.ToByteString());
+                }
+		    
                 foreach (var opcode in masterCode.Opcodes)
                 {
                     sb.AppendLine(opcode.ToByteString());

@@ -83,6 +83,8 @@ When using the more complex addressing modes the order that items should be spec
 
 Cheat ASM allows for you to define mutable variables as well as constant variables. During assembly constant variables will have their literal value substituted, while mutable variables will be assigned a register number. The assigned register number if effectively reserved for use and the assembler will error in the event of an explicit use of a register number that is assigned to a variable.
 
+Variables can be of the following types: `.u8, .s8,.u16, .s16, .u32, .s32, .u64, .s64, .f32, .f64` where `u` is unsigned, `s` is signed, and `f` is floating point. The number represents the bit width of the value.
+
 Here is a concrete example of how to use variables with CheatASM:
 
 Note: current issue with mutable variables, while the syntax allows you to provide an initial value, the cheats are not assembled with init logic, this is in progress.

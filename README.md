@@ -83,11 +83,13 @@ When using the more complex addressing modes the order that items should be spec
 
 Cheat ASM allows for you to define mutable variables as well as constant variables. During assembly constant variables will have their literal value substituted, while mutable variables will be assigned a register number. The assigned register number if effectively reserved for use and the assembler will error in the event of an explicit use of a register number that is assigned to a variable.
 
+Register assignment for variables happens per-cheat and they are assigned starting of 0xF and descending. Assignment is done at first-use.
+
 Variables can be of the following types: `.u8, .s8,.u16, .s16, .u32, .s32, .u64, .s64, .f32, .f64` where `u` is unsigned, `s` is signed, and `f` is floating point. The number represents the bit width of the value.
 
-Here is a concrete example of how to use variables with CheatASM:
+Mutable variables will have an initial opcode inserted at the beginning of each cheat to initialize the register with the proper value. This means that at the start of each individual cheat the mutable variable initial value gets restored.
 
-Note: current issue with mutable variables, while the syntax allows you to provide an initial value, the cheats are not assembled with init logic, this is in progress.
+Here is a concrete example of how to use variables with CheatASM:
 
 ```
 floatTest: .f32 4.83
@@ -100,8 +102,46 @@ mov.d[R0 + 0x123], floatTest
 mov.q R0, [MAIN + mainOffset]
 
 .cheat "Sample"
+mov.q [MAIN + 0x432], ten
 mov.d[R0 + mainOffset], R7
 mov.q R0, [MAIN + mainOffset]
+mov.d[R0 + 0x123], floatTest
+```
+
+Assembles to: 
+
+```
+[Assembled by CheatASM]
+{Setup}
+400F0000 00000000 409A8F5C
+A4F00200 00000123
+58000000 00001234
+
+[Sample]
+400F0000 00000000 0000000A
+400E0000 00000000 409A8F5C
+A8F00400 00000432
+A4700200 00001234
+58000000 00001234
+A4E00200 00000123
+```
+
+Which disassembles to:
+
+```
+[Assembled by CheatASM]
+{Setup}
+mov.q RF, 0x409A8F5C
+mov.d [R0 + 0x123], RF
+mov.q R0, [MAIN + 0x1234]
+
+[Sample]
+mov.q RF, 0xA
+mov.q RE, 0x409A8F5C
+mov.q [MAIN + 0x432], RF
+mov.d [R0 + 0x1234], R7
+mov.q R0, [MAIN + 0x1234]
+mov.d [R0 + 0x123], RE
 ```
 
 ### OpCode Mnemonic Listing
